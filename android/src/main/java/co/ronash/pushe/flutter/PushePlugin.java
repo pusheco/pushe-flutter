@@ -1,6 +1,9 @@
 package co.ronash.pushe.flutter;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 
 import org.json.JSONException;
@@ -17,12 +20,13 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 /**
  * PushePlugin
+ *
  * #author Mahdi Malvandi
  */
 public class PushePlugin implements MethodCallHandler {
 
     private Context context;
-    private Registrar registrar;
+    private static boolean isNotificationListenersEnabled = false;
 
     public static void registerWith(Registrar registrar) {
         final MethodChannel channel = new MethodChannel(registrar.messenger(), "Pushe");
@@ -30,8 +34,12 @@ public class PushePlugin implements MethodCallHandler {
     }
 
     private PushePlugin(Registrar registrar) {
-        this.registrar = registrar;
         this.context = registrar.context();
+
+        IntentFilter i = new IntentFilter();
+        i.addAction(context.getPackageName() + ".NOTIFICATION_RECEIVED");
+
+        context.registerReceiver(new PusheNotificationReceiver(new MethodChannel(registrar.messenger(), "Pushe")), i);
     }
 
     @Override
@@ -104,7 +112,12 @@ public class PushePlugin implements MethodCallHandler {
                 }
                 break;
             case "Pushe#initializeNotificationListeners":
-                initializePusheListeners(new MethodChannel(registrar.messenger(), "Pushe"));
+                if (call.hasArgument("enabled")) {
+                    Boolean b = call.argument("enabled");
+                    if (b != null) {
+                        initializePusheListeners(b);
+                    }
+                }
                 break;
             default:
                 result.notImplemented();
@@ -112,41 +125,47 @@ public class PushePlugin implements MethodCallHandler {
         }
     }
 
-    private void initializePusheListeners(final MethodChannel channel) {
-        Pushe.setNotificationListener(new Pushe.NotificationListener() {
-            @Override
-            public void onNotificationReceived(@NonNull final NotificationData notificationData) {
-                System.out.println("NOTIFICATION_RECEIVED");
-                registrar.activity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        System.out.println("NOTIFICATION_RECEIVED on uiThread");
-                        channel.invokeMethod("Pushe#onNotificationReceived", notificationData.toString());
-                    }
-                });
-            }
-
-            @Override
-            public void onNotificationClicked(@NonNull NotificationData notificationData) {
-                channel.invokeMethod("Pushe#onNotificationClicked", notificationData.toString());
-            }
-
-            @Override
-            public void onNotificationButtonClicked(@NonNull NotificationData notificationData,
-                                                    @NonNull NotificationButtonData notificationButtonData) {
-                channel.invokeMethod("Pushe#onNotificationButtonClicked",
-                        new String[] {notificationData.toString(), notificationButtonData.toString()});
-            }
-
-            @Override
-            public void onCustomContentReceived(@NonNull JSONObject jsonObject) {
-                channel.invokeMethod("Pushe#onCustomContentReceived", jsonObject.toString());
-            }
-
-            @Override
-            public void onNotificationDismissed(@NonNull NotificationData notificationData) {
-                channel.invokeMethod("Pushe#onNotificationDismissed", notificationData.toString());
-            }
-        });
+    private void initializePusheListeners(boolean enabled) {
+        isNotificationListenersEnabled = enabled;
     }
+
+
+
+    public static class PusheNotificationReceiver extends BroadcastReceiver {
+        private MethodChannel channel;
+
+        public PusheNotificationReceiver(MethodChannel methodChannel) {
+            channel = methodChannel;
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            System.out.println("In onReceive");
+            if (!isNotificationListenersEnabled) return;
+            String action = intent.getAction() == null ? "" : intent.getAction();
+            if (action.equals(context.getPackageName() + ".NOTIFICATION_RECEIVED")) {
+                System.out.println("NOTIFICATION_RECEIVED on uiThread");
+                String data = intent.getStringExtra("data");
+                channel.invokeMethod("Pushe#onNotificationReceived", data);
+            } else if (action.equals(context.getPackageName() + ".NOTIFICATION_CLICKED")) {
+                System.out.println("NOTIFICATION_CLICKED on uiThread");
+                String data = intent.getStringExtra("data");
+                channel.invokeMethod("Pushe#onNotificationClicked", data);
+            } else if (action.equals(context.getPackageName() + ".NOTIFICATION_BUTTON_CLICKED")) {
+                System.out.println("NOTIFICATION_BUTTON_CLICKED on uiThread");
+                String data = intent.getStringExtra("data");
+                String button = intent.getStringExtra("button");
+                channel.invokeMethod("Pushe#onNotificationButtonClicked", new String[] {data, button});
+            } else if (action.equals(context.getPackageName() + ".NOTIFICATION_CUSTOM_CONTENT_RECEIVED")) {
+                System.out.println("NOTIFICATION_CUSTOM_CONTENT_RECEIVED on uiThread");
+                String data = intent.getStringExtra("json");
+                channel.invokeMethod("Pushe#onCustomContentReceived", data);
+            } else if (action.equals(context.getPackageName() + ".NOTIFICATION_DISMISSED")) {
+                System.out.println("NOTIFICATION_DISMISSED on uiThread");
+                String data = intent.getStringExtra("data");
+                channel.invokeMethod("Pushe#onNotificationDismissed", data);
+            }
+        }
+    }
+
 }

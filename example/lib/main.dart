@@ -29,7 +29,7 @@ class _MyAppState extends State<MyApp> {
       Pushe.initialize();
       pusheId = await Pushe.getPusheId();
       isPusheInited = await Pushe.isPusheInitialized();
-      Pushe.initializeNotificationListeners();
+      Pushe.initializeNotificationListeners(true);
     } on Exception {}
 
     // If the widget was removed from the tree while the asynchronous platform
