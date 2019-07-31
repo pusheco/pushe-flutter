@@ -17,6 +17,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
+import io.flutter.view.FlutterMain;
 
 /**
  * PushePlugin
@@ -38,7 +39,10 @@ public class PushePlugin implements MethodCallHandler {
 
         IntentFilter i = new IntentFilter();
         i.addAction(context.getPackageName() + ".NOTIFICATION_RECEIVED");
-
+        i.addAction(context.getPackageName() + ".NOTIFICATION_CLICKED");
+        i.addAction(context.getPackageName() + ".NOTIFICATION_BUTTON_CLICKED");
+        i.addAction(context.getPackageName() + ".NOTIFICATION_DISMISSED");
+        i.addAction(context.getPackageName() + ".NOTIFICATION_CUSTOM_CONTENT_RECEIVED");
         context.registerReceiver(new PusheNotificationReceiver(new MethodChannel(registrar.messenger(), "Pushe")), i);
     }
 
@@ -140,7 +144,10 @@ public class PushePlugin implements MethodCallHandler {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            System.out.println("In onReceive");
+            FlutterMain.ensureInitializationComplete(context, null);
+            System.out.println("OnReceive - Trying to init Flutter");
+            FlutterMain.ensureInitializationComplete(context, null);
+            System.out.println("onReceive - Init completed");
             if (!isNotificationListenersEnabled) return;
             String action = intent.getAction() == null ? "" : intent.getAction();
             if (action.equals(context.getPackageName() + ".NOTIFICATION_RECEIVED")) {
