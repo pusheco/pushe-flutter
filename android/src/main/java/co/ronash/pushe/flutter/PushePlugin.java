@@ -27,7 +27,6 @@ import io.flutter.view.FlutterMain;
 public class PushePlugin implements MethodCallHandler {
 
     private Context context;
-    private static boolean isNotificationListenersEnabled = false;
 
     public static void registerWith(Registrar registrar) {
         final MethodChannel channel = new MethodChannel(registrar.messenger(), "Pushe");
@@ -51,14 +50,14 @@ public class PushePlugin implements MethodCallHandler {
         String methodName = call.method;
         switch (methodName) {
             case "Pushe#initialize":
-                Boolean dialog = null;
+                Boolean showDialog = null;
                 if (call.hasArgument("showDialog")) {
-                    dialog = call.argument("showDialog");
+                    showDialog = call.argument("showDialog");
                 }
-                if (dialog == null) dialog = true;
-                Pushe.initialize(context, dialog);
+                if (showDialog == null) showDialog = true;
+                Pushe.initialize(context, showDialog);
                 System.out.println("[Plugin] Trying to initialize Pushe");
-                Pushe.initialize(context, true); // TODO: Take the true as optional from user
+                Pushe.initialize(context, true);
                 break;
             case "Pushe#getPusheId":
                 result.success(Pushe.getPusheId(context));
@@ -69,7 +68,7 @@ public class PushePlugin implements MethodCallHandler {
                     Pushe.subscribe(context, topic);
                     result.success("Will subscribe to topic " + topic);
                 } else {
-                    result.error("Failed to subscribe to topic", null, null);
+                    result.error("404", "Failed to subscribe. No topic argument is passed", null);
                 }
                 break;
             case "Pushe#unsubscribe":
@@ -78,7 +77,7 @@ public class PushePlugin implements MethodCallHandler {
                     Pushe.unsubscribe(context, topic);
                     result.success("Will unsubscribe from topic " + topic);
                 } else {
-                    result.error("Failed to unsubscribe from topic", null, null); // TODO: What are these nulls
+                    result.error("404", "Failed to unsubscribe. No topic provided.", null); // TODO: What are these nulls
                 }
                 break;
             case "Pushe#setNotificationOff":
@@ -115,23 +114,12 @@ public class PushePlugin implements MethodCallHandler {
                     }
                 }
                 break;
-            case "Pushe#initializeNotificationListeners":
-                if (call.hasArgument("enabled")) {
-                    Boolean b = call.argument("enabled");
-                    if (b != null) {
-                        initializePusheListeners(b);
-                    }
-                }
-                break;
             default:
                 result.notImplemented();
                 break;
         }
     }
 
-    private void initializePusheListeners(boolean enabled) {
-        isNotificationListenersEnabled = enabled;
-    }
 
 
 
@@ -145,30 +133,21 @@ public class PushePlugin implements MethodCallHandler {
         @Override
         public void onReceive(Context context, Intent intent) {
             FlutterMain.ensureInitializationComplete(context, null);
-            System.out.println("OnReceive - Trying to init Flutter");
-            FlutterMain.ensureInitializationComplete(context, null);
-            System.out.println("onReceive - Init completed");
-            if (!isNotificationListenersEnabled) return;
             String action = intent.getAction() == null ? "" : intent.getAction();
             if (action.equals(context.getPackageName() + ".NOTIFICATION_RECEIVED")) {
-                System.out.println("NOTIFICATION_RECEIVED on uiThread");
                 String data = intent.getStringExtra("data");
                 channel.invokeMethod("Pushe#onNotificationReceived", data);
             } else if (action.equals(context.getPackageName() + ".NOTIFICATION_CLICKED")) {
-                System.out.println("NOTIFICATION_CLICKED on uiThread");
                 String data = intent.getStringExtra("data");
                 channel.invokeMethod("Pushe#onNotificationClicked", data);
             } else if (action.equals(context.getPackageName() + ".NOTIFICATION_BUTTON_CLICKED")) {
-                System.out.println("NOTIFICATION_BUTTON_CLICKED on uiThread");
                 String data = intent.getStringExtra("data");
                 String button = intent.getStringExtra("button");
                 channel.invokeMethod("Pushe#onNotificationButtonClicked", new String[] {data, button});
             } else if (action.equals(context.getPackageName() + ".NOTIFICATION_CUSTOM_CONTENT_RECEIVED")) {
-                System.out.println("NOTIFICATION_CUSTOM_CONTENT_RECEIVED on uiThread");
                 String data = intent.getStringExtra("json");
                 channel.invokeMethod("Pushe#onCustomContentReceived", data);
             } else if (action.equals(context.getPackageName() + ".NOTIFICATION_DISMISSED")) {
-                System.out.println("NOTIFICATION_DISMISSED on uiThread");
                 String data = intent.getStringExtra("data");
                 channel.invokeMethod("Pushe#onNotificationDismissed", data);
             }

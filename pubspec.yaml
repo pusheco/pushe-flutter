@@ -1,8 +1,8 @@
 name: pushe
 description: Flutter plugin for Pushe sdk
 version: 0.0.1
-author:
-homepage:
+author: Mahdi Malvandi
+homepage: https://pushe.co
 
 environment:
   sdk: ">=2.1.0 <3.0.0"

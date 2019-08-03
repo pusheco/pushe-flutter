@@ -18,7 +18,7 @@ class Pushe {
 
   static const MethodChannel _channel = const MethodChannel('Pushe');
   
-  static void initialize({showDialog: true}) => _channel.invokeMethod('Pushe#initialize');
+  static void initialize({showDialog: true}) => _channel.invokeMethod('Pushe#initialize', {"showDialog":showDialog});
 
   static Future<String> getPusheId() async => await _channel.invokeMethod("Pushe#getPusheId");
 
@@ -32,10 +32,11 @@ class Pushe {
 
   static Future<bool> isPusheInitialized() async => await _channel.invokeMethod("Pushe#isPusheInitialized");
 
-  static void initializeNotificationListeners(bool enabled) {
-    _channel.setMethodCallHandler(_handleMethod);
-    _channel.invokeMethod("Pushe#initializeNotificationListeners", {"enabled":enabled});
-  }
+  static sendSimpleNotifToUser(String pusheId, String title, String content) => _channel.invokeMethod("Pushe#sendSimpleNotifToUser", {"pusheId":pusheId, "title":title, "content":content});
+
+  static sendAdvancedNotifToUser(String pusheId, String notificationJson) => _channel.invokeMethod("Pushe#sendSimpleNotifToUser", {"pusheId":pusheId, "json":notificationJson});
+
+  static initializeNotificationListeners() => _channel.setMethodCallHandler(_handleMethod);
 
   // callbacks
   static setOnNotificationReceived(Function(String) f) => _receiveCallback = f;
