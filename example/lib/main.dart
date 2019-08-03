@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-
 import 'package:pushe/pushe.dart';
 
 void main() => runApp(MyApp());
@@ -22,14 +21,43 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    String pusheId;
-    bool isPusheInited;
-    // Platform messages may fail, so we use a try/catch PlatformException.
+    String pusheId = "Data not loaded";
+    bool isPusheInited = true;
+     //Platform messages may fail, so we use a try/catch PlatformException.
     try {
       Pushe.initialize();
-      pusheId = await Pushe.getPusheId();
-      isPusheInited = await Pushe.isPusheInitialized();
-      Pushe.initializeNotificationListeners(true);
+      Pushe.initializeNotificationListeners();
+      Pushe.setOnNotificationReceived((data) {
+        debugPrint('Notif received');
+        setState(() {
+          _pusheId = "Data received: $data";
+        });
+      });
+      Pushe.setOnNotificationClicked((data) {
+        debugPrint('Notif clicked');
+        setState(() {
+          _pusheId = "Data: $data";
+        });
+      });
+      Pushe.setOnNotificationDismissed((data) {
+        debugPrint('Notif dismissed');
+        setState(() {
+          _pusheId = "Data: $data";
+        });
+      });
+      Pushe.setOnNotificationCustomContentReceived((data) {
+        debugPrint('Notif custom content');
+        setState(() {
+          _pusheId = "Data: $data";
+        });
+      });
+      Pushe.setOnNotificationButtonClicked((data, button) {
+        debugPrint('Notif button clicked');
+        setState(() {
+          _pusheId = "Data: $data";
+        });
+      });
+
     } on Exception {}
 
     // If the widget was removed from the tree while the asynchronous platform
@@ -48,16 +76,9 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Pushe Plugin example'),
         ),
-        body: Center(
-            child: Column(
-          children: <Widget>[
-            Text('PusheId is: $_pusheId\n'),
-            Text('PusheId is: $_isPusheInited\n'),
-          ],
-        )),
-      ),
+        body: Center(child: Column(children: <Widget>[Text(_pusheId)])))
     );
   }
 }

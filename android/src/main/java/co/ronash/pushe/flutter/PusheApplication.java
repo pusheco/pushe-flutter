@@ -21,7 +21,7 @@ public class PusheApplication extends FlutterApplication {
         initializeNotificationListeners(this);
     }
 
-    private static void initializeNotificationListeners(final Context context) {
+    public static void initializeNotificationListeners(final Context context) {
         Pushe.setNotificationListener(new Pushe.NotificationListener() {
             @Override
             public void onNotificationReceived(@NonNull final NotificationData notificationData) {

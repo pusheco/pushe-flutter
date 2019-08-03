@@ -77,7 +77,7 @@ public class PushePlugin implements MethodCallHandler {
                     Pushe.unsubscribe(context, topic);
                     result.success("Will unsubscribe from topic " + topic);
                 } else {
-                    result.error("404", "Failed to unsubscribe. No topic provided.", null); // TODO: What are these nulls
+                    result.error("404", "Failed to unsubscribe. No topic provided.", null);
                 }
                 break;
             case "Pushe#setNotificationOff":
@@ -114,6 +114,9 @@ public class PushePlugin implements MethodCallHandler {
                     }
                 }
                 break;
+            case "Pushe#initNotificationListenerManually":
+                initNotificationListenerManually();
+                break;
             default:
                 result.notImplemented();
                 break;
@@ -121,7 +124,9 @@ public class PushePlugin implements MethodCallHandler {
     }
 
 
-
+    private void initNotificationListenerManually() {
+        PusheApplication.initializeNotificationListeners(context.getApplicationContext());
+    }
 
     public static class PusheNotificationReceiver extends BroadcastReceiver {
         private MethodChannel channel;
@@ -143,7 +148,7 @@ public class PushePlugin implements MethodCallHandler {
             } else if (action.equals(context.getPackageName() + ".NOTIFICATION_BUTTON_CLICKED")) {
                 String data = intent.getStringExtra("data");
                 String button = intent.getStringExtra("button");
-                channel.invokeMethod("Pushe#onNotificationButtonClicked", new String[] {data, button});
+                channel.invokeMethod("Pushe#onNotificationButtonClicked", data+"|||"+button);
             } else if (action.equals(context.getPackageName() + ".NOTIFICATION_CUSTOM_CONTENT_RECEIVED")) {
                 String data = intent.getStringExtra("json");
                 channel.invokeMethod("Pushe#onCustomContentReceived", data);
