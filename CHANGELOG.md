@@ -18,4 +18,6 @@
 
 * Listeners of notification callbacks are working.
 
+* Added Release offline AAR package.
+
 * More comments in plugin.
