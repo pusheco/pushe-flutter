@@ -40,7 +40,7 @@ android {
 
 dependencies {
 
-    api (name: 'pushelib-debug', ext: 'aar')
+    api (name: 'pushelib-releaseForBintray', ext: 'aar')
     implementation ('com.google.android.gms:play-services-location:16.0.0') {exclude group: 'com.android.support'}
     implementation ('com.google.android.gms:play-services-ads:16.0.0') {exclude group: 'com.android.support'}
     implementation ('com.evernote:android-job:1.2.6') {exclude group: 'com.android.support'}
