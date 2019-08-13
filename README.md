@@ -2,6 +2,12 @@
 
 A plugin to use Pushe sdk in Flutter framework.
 
+### Run the sample
+
+Run: `git clone https://github.com/pusheco/flutter-sample.git`<br>
+The go to example: `cd example`<br>
+And run the example on a connected device: `flutter run`<br>
+
 ## Installation
 
 Add the plugin to `pubspec.yaml`:
