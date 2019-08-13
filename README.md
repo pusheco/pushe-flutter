@@ -99,6 +99,8 @@ Pushe.setOnNotificationButtonClicked((notification, clickedButton) {
 });
 ```
 
+**Note**: Callbacks only work when app is not fully closed and flutter is still running under the hood. So when app is not opened or force stopped, listeners will not be called.
+
 ## More Info
 For detailed documentations visit https://pushe.co/docs/flutter/
 
