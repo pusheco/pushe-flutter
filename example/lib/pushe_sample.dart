@@ -97,7 +97,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
           bottom: PreferredSize(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(0, 0, 0, 2),
-                child: Text('Flutter plugin: 0.0.2 | version: 1.6.3', style: TextStyle(color: Colors.white)),
+                child: Text('Flutter plugin: 0.2.1| version: 1.6.3', style: TextStyle(color: Colors.white)),
               ),
               preferredSize: null),
         ),
