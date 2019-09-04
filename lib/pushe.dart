@@ -1,18 +1,19 @@
 import 'dart:async';
-
 import 'package:flutter/services.dart';
+import 'dart:convert';
 
 ///
 /// @author Mahdi Malvandi
+/// Main plugin class handling most of SDK's works.
 ///
 class Pushe {
 
   // Callback handlers
-  static void Function(String) _receiveCallback;
-  static void Function(String) _clickCallback;
-  static void Function(String) _dismissCallback;
+  static void Function(NotificationData) _receiveCallback;
+  static void Function(NotificationData) _clickCallback;
+  static void Function(NotificationData) _dismissCallback;
   static void Function(String) _customContentCallback;
-  static void Function(String, String) _buttonClickCallback;
+  static void Function(NotificationData, NotificationButtonData) _buttonClickCallback;
 
 
 
@@ -54,6 +55,8 @@ class Pushe {
   /// [PusheApplication.initializeNotificationListeners(context.getApplicationContext())] in your application#onCreate.
   /// Chance of getting callback using application class (When app is closed) is more than normal callbacks.
   /// If you use normal callbacks you have to call this method every time to add listener.
+  ///
+  /// **NOTE**: If you have modified your AndroidManifest, PASS true to this example, otherwise **you might get the callbacks twice.**
   static Future<void> initializeNotificationListeners({bool withManifestOverrode:false}) async {
     _channel.setMethodCallHandler(_handleMethod);
     if (!withManifestOverrode) {
@@ -62,11 +65,11 @@ class Pushe {
   }
 
   // callbacks
-  static setOnNotificationReceived(Function(String) f) => _receiveCallback = f;
-  static setOnNotificationClicked(Function(String) f) => _clickCallback = f;
-  static setOnNotificationButtonClicked(Function(String, String) f) => _buttonClickCallback = f;
+  static setOnNotificationReceived(Function(NotificationData) f) => _receiveCallback = f;
+  static setOnNotificationClicked(Function(NotificationData) f) => _clickCallback = f;
+  static setOnNotificationButtonClicked(Function(NotificationData, NotificationButtonData) f) => _buttonClickCallback = f;
   static setOnNotificationCustomContentReceived(Function(String) f) => _customContentCallback = f;
-  static setOnNotificationDismissed(Function(String) f) => _dismissCallback = f;
+  static setOnNotificationDismissed(Function(NotificationData) f) => _dismissCallback = f;
 
 
 
@@ -75,16 +78,112 @@ class Pushe {
   ///
   static Future<Null> _handleMethod(MethodCall call) async {
     if (call.method == 'Pushe#onNotificationReceived') {
-      _receiveCallback?.call(call.arguments);
+      _receiveCallback?.call(NotificationData.fromJson(call.arguments));
     } else if (call.method == 'Pushe#onNotificationClicked') {
-    _clickCallback?.call(call.arguments);
+    _clickCallback?.call(NotificationData.fromJson(call.arguments));
     } else if (call.method == 'Pushe#onNotificationButtonClicked') {
-      _buttonClickCallback?.call(call.arguments, call.arguments);
+      try {
+        var parts = call.arguments.toString().split("|||");
+        _buttonClickCallback?.call(NotificationData.fromJson(parts[0]), NotificationButtonData.fromJsonString(parts[1]));
+      } catch(e) {}
     } else if (call.method == 'Pushe#onNotificationCustomContentReceived') {
-      _customContentCallback?.call(call.arguments);
+      try {
+        var customContent = jsonDecode(call.arguments['json']);
+        _customContentCallback?.call(customContent);
+      } catch(e) {}
     } else if (call.method == 'Pushe#onNotificationDismissed') {
-      _dismissCallback?.call(call.arguments);
+      _dismissCallback?.call(NotificationData.fromJson(call.arguments));
     }
     return null;
   }
+}
+
+///
+/// Notification data class as an interface between native callback data classes and Flutter dart code.
+/// When a notification event happens (like Receive), callbacks will hold instances of this class.
+///
+class NotificationData {
+  String _title, _content, _bigTitle, _bigContent, _summary, _imageUrl, _iconUrl, _customContent;
+  List<NotificationButtonData> _buttons;
+
+  NotificationData._();
+
+  NotificationData.create(this._title, this._content, this._bigTitle,
+      this._bigContent, this._summary, this._imageUrl, this._iconUrl,
+      this._customContent, this._buttons);
+
+  static NotificationData fromJson(String json) {
+    try {
+      var data = jsonDecode(json);
+      return NotificationData.create(
+          data['title'], data['content'],
+          data['bigTitle'], data['bigContent'],
+          data['summary'], data['imageUrl'],
+          data['iconUrl'], data['json'],
+          NotificationButtonData.fromJsonList(data['buttons']));
+    } catch(e) {
+      print('Error getting notification data from json\nError:$e\nJson:$json');
+      return null;
+    }
+  }
+
+  @override
+  String toString() => 'NotificationData{_title: $_title, _content: $_content, _bigTitle: $_bigTitle, _bigContent: $_bigContent, _summary: $_summary, _imageUrl: $_imageUrl, _iconUrl: $_iconUrl, _customContent: $_customContent, buttons: $_buttons}';
+
+  get customContent => _customContent;
+  get iconUrl => _iconUrl;
+  get imageUrl => _imageUrl;
+  get summary => _summary;
+  get bigContent => _bigContent;
+  get bigTitle => _bigTitle;
+  get content => _content;
+  get title => _title;
+  get buttons => _buttons;
+
+}
+
+///
+/// When there are buttons in the notification they are accessible through callbacks.
+/// For every button there would be an object in the callback notification data object.
+/// And also when a button is clicked, it's id and text will be passes separately in `onNotificationButtonClicked` callback.
+class NotificationButtonData {
+  String _text;
+  int _id;
+
+  NotificationButtonData._();
+  NotificationButtonData.create(this._text, this._id);
+
+  int get id => _id;
+  String get text => _text;
+
+  @override
+  String toString() => 'NotificationButtonData{_text: $_text, _id: $_id}';
+
+  static NotificationButtonData fromMap(dynamic data) {
+    try {
+      return NotificationButtonData.create(data['big_content'], data['btn_id']);
+    } catch (e) {
+      print('Error getting button from json\nError:$e\nJson:$json');
+      return null;
+    }
+  }
+
+  static NotificationButtonData fromJsonString(dynamic json) {
+    return fromMap(jsonDecode(json));
+  }
+
+  static List<NotificationButtonData> fromJsonList(dynamic json) {
+    try {
+      var result = (json as List<dynamic>).map((item) {
+        return fromMap(item);
+      });
+      return result.toList();
+    } catch(e) {
+      print('Error getting button list from notification\nError:$e\nJson:$json');
+      return null;
+    }
+  }
+
+
+
 }

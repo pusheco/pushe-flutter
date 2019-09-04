@@ -1,7 +1,7 @@
 name: pushe
-description: Flutter plugin for Pushe sdk
-version: 0.0.2
-author: Mahdi Malvandi <mahdi.malvandi@pushe.co>
+description: A plugin implementing functionality of Pushe Android SDK. Refer to pushe.co for further details about Pushe.
+version: 0.9.1
+author: Pusheco <mahdi.malvandi@pushe.co>
 homepage: https://pushe.co
 
 environment:
