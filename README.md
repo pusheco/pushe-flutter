@@ -105,6 +105,26 @@ Pushe.setOnNotificationButtonClicked((notification, clickedButton) {
 });
 ```
 
+#### Send notification using code
+
+It's possible to send push notification to the device using code [**To a device having this app installed**].<br>
+The only thing you need is the `PusheId` of that device.
+
+##### Send simple notification
+
+```dart
+var pusheId = "some_id"; // Pass await Pushe.getPusheId() to send a notification to this device.
+Pushe.sendSimpleNotifToUser(pusheId, 'title', 'content');
+```
+
+#### Send advanced notification
+
+```dart
+var pusheId = "some_id"; // Pass await Pushe.getPusheId() to send a notification to this device.
+Pushe.sendAdvancedNotifToUser(pusheId, '{"title":"Hello","content":"Have a good day!"}'); 
+```
+> For complete json example refer to [Pushe Restful api doc](https://pushe.co/docs/api/#api_send_advance_notification).
+
 #### Use it along with FireBase messaging
 
 If you also use firebase messaging plugin at your project, you might have problems receiving and sometimes losing the message.<br>
