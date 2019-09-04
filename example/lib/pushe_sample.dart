@@ -10,6 +10,12 @@ class _PusheSampleState extends State<PusheSampleWidget> {
 
   String statusText = "";
 
+  @override
+  void initState() {
+    _implementListeners();
+    super.initState();
+  }
+
   void _updateStatus(String text) async {
     var result = "";
 
@@ -41,21 +47,38 @@ class _PusheSampleState extends State<PusheSampleWidget> {
         Pushe.sendAdvancedNotifToUser(await Pushe.getPusheId(), '{"title":"title1","content":"content1"}');
         break;
       case 7:
-        result = "Send event not in current version...";
-        break;
-      case 8:
         result = "Initializing notification listeners";
         Pushe.initializeNotificationListeners();
-        Pushe.setOnNotificationReceived((notification) {
-          setState(() {
-            _updateStatus("Notification received: $notification");
-          });
-        });
+        break;
+      default:
+        result = text;
         break;
     }
 
     setState(() {
       statusText = '$statusText \n -------- \n $result';
+    });
+  }
+
+  void _implementListeners() {
+    Pushe.setOnNotificationClicked((notificationData) {
+      _updateStatus('Notification clicked: $notificationData');
+    });
+
+    Pushe.setOnNotificationDismissed((notificationData) {
+      _updateStatus('Notification dismissed: $notificationData');
+    });
+
+    Pushe.setOnNotificationReceived((notificationData) {
+      _updateStatus('Notification received: $notificationData');
+    });
+
+    Pushe.setOnNotificationButtonClicked((notificationData, button) {
+      _updateStatus('Notification button clicked: $notificationData, $button');
+    });
+
+    Pushe.setOnNotificationCustomContentReceived((content) {
+      _updateStatus('Notification custom content received: $content');
     });
   }
 
@@ -74,7 +97,6 @@ class _PusheSampleState extends State<PusheSampleWidget> {
     "Unsubscribe from topic",
     "Send simple notification",
     "Send advanced notification",
-    "Send event",
     "Initialize listeners"
   ];
 
@@ -85,19 +107,11 @@ class _PusheSampleState extends State<PusheSampleWidget> {
     return Scaffold(
         appBar: AppBar(
           title: Text('Pushe sample'),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.info_outline, color: Colors.white),
-              onPressed: () {
-                print('I suppose it works');
-              },
-            )
-          ],
           centerTitle: true,
           bottom: PreferredSize(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(0, 0, 0, 2),
-                child: Text('Flutter plugin: 0.2.1| version: 1.6.3', style: TextStyle(color: Colors.white)),
+                child: Text('Flutter plugin: 0.3.0| native version: 1.6.3', style: TextStyle(color: Colors.white)),
               ),
               preferredSize: null),
         ),

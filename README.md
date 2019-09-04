@@ -105,6 +105,38 @@ Pushe.setOnNotificationButtonClicked((notification, clickedButton) {
 });
 ```
 
+#### Use it along with FireBase messaging
+
+If you also use firebase messaging plugin at your project, you might have problems receiving and sometimes losing the message.<br>
+Since Pushe uses FCM and one app can only have one firebase service, using both is not possible unless you do this:
+
+1. Remove Pushe service from your AndroidManifest tree using this code (add it to `application` block):
+
+```xml
+<service
+   android:name="co.ronash.pushe.fcm.FcmService" 
+   tools:node="remove" />
+```
+
+> Make sure `xmlns:tools="http://schemas.android.com/tools"` exists in the manifest tag attributes. Otherwise **tools** is not known to app.
+
+2. Remove firebase messaging service too:
+
+```xml
+<service
+   android:name="io.flutter.plugins.firebasemessaging.FlutterFirebaseMessagingService" 
+   tools:node="remove" />
+```
+
+3. Instead, add this tag to the AndroidManifest too let the Plugin handle both messaging services and make them work together.
+
+```xml
+<service android:name="co.ronash.pushe.flutter.PusheFcmService">
+    <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT" />
+    </intent-filter>
+</service>
+```
 **Note**: Callbacks only work when app is not fully closed and flutter is still running under the hood. So when app is not opened or force stopped, listeners will not be called.
 
 ## More Info

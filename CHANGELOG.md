@@ -1,6 +1,15 @@
+## 0.9.1
+
+* Recreating notification callbacks. Callbacks will return actual notification objects now.
+
+* From now on, Plugin can be used along with Firebase messaging plugin.
+
+* Minor improvements and bug fixes.
+
 ## 0.2.1
 
 * Added better styled callbacks.
+
 * Minor improvements.
 
 ## 0.0.2
