@@ -96,7 +96,7 @@ Pushe.setOnNotificationDismissed((notification) {
       // Called when notification was dismissed
 });
 
-Pushe.setOnNotificationCustomContentReceived((notification) {
+Pushe.setOnNotificationCustomContentReceived((customContent) {
       // Called when notification custom content was received
 });
     
