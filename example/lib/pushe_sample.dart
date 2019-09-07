@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pushe/pushe.dart';
 
+
 class PusheSampleWidget extends StatefulWidget {
   createState() => _PusheSampleState();
 }
@@ -9,6 +10,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
   // Fields
 
   String statusText = "";
+  var _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -16,39 +18,40 @@ class _PusheSampleState extends State<PusheSampleWidget> {
     super.initState();
   }
 
+
   void _updateStatus(String text) async {
     var result = "";
 
     switch (actions.indexOf(text)) {
       case 0:
-        result = "Initializing";
+        result = "Initialize Pushe";
         Pushe.initialize(showDialog: true);
         break;
       case 1:
-        result = await Pushe.getPusheId();
+        result = 'Pushe id: ${await Pushe.getPusheId()}';
         break;
       case 2:
-        result = "Is Pushe initialized: " + (await Pushe.isPusheInitialized()).toString();
+        result = "Is Pushe initialized: " +
+            (await Pushe.isPusheInitialized()).toString();
         break;
       case 3:
-        result = "Subscribing to topic: sport";
+        result = "Subscribe to topic: sport";
         Pushe.subscribe('sport');
         break;
       case 4:
-        result = "Unsubscribing from topic: sport";
+        result = "Unsubscribe from topic: sport";
         Pushe.unsubscribe('sport');
         break;
       case 5:
-        result = 'Sending simple notif {"title":"title1","content":"content1"}';
-        Pushe.sendSimpleNotifToUser(await Pushe.getPusheId(), 'title1', 'content1');
+        result = 'Sending simple notification with title:"title1",content:"content1"}';
+        Pushe.sendSimpleNotifToUser(
+            await Pushe.getPusheId(), 'title1', 'content1');
         break;
       case 6:
-        result = 'Sending advanced notif {"title":"title1","content":"content1"}';
-        Pushe.sendAdvancedNotifToUser(await Pushe.getPusheId(), '{"title":"title1","content":"content1"}');
-        break;
-      case 7:
-        result = "Initializing notification listeners";
-        Pushe.initializeNotificationListeners();
+        result =
+            'Send advanced notification with json: {"title":"title1","content":"content1"}';
+        Pushe.sendAdvancedNotifToUser(await Pushe.getPusheId(),
+            '{"title":"title1","content":"content1"}');
         break;
       default:
         result = text;
@@ -56,38 +59,30 @@ class _PusheSampleState extends State<PusheSampleWidget> {
     }
 
     setState(() {
-      statusText = '$statusText \n -------- \n $result';
+      statusText = '$statusText \n --------------- \n $result \n ${DateTime.now()}';
     });
   }
 
   void _implementListeners() {
-    Pushe.setOnNotificationClicked((notificationData) {
-      _updateStatus('Notification clicked: $notificationData');
-    });
-
-    Pushe.setOnNotificationDismissed((notificationData) {
-      _updateStatus('Notification dismissed: $notificationData');
-    });
-
-    Pushe.setOnNotificationReceived((notificationData) {
-      _updateStatus('Notification received: $notificationData');
-    });
-
-    Pushe.setOnNotificationButtonClicked((notificationData, button) {
-      _updateStatus('Notification button clicked: $notificationData, $button');
-    });
-
-    Pushe.setOnNotificationCustomContentReceived((content) {
-      _updateStatus('Notification custom content received: $content');
-    });
+    Pushe.setNotificationListener(
+      onReceived: (notificationData) => _updateStatus('Notification received: $notificationData'),
+      onClicked: (notificationData) => _updateStatus('Notification clicked: $notificationData'),
+      onDismissed: (notificationData) => _updateStatus('Notification dismissed: $notificationData'),
+      onButtonClicked: (notificationData, clickedButton) => _updateStatus('Notification button clicked: $notificationData, $clickedButton'),
+      onCustomContentReceived: (customContent) => _updateStatus('Notification custom content received: $customContent'),
+    );
   }
 
   void _clearStatus() {
     setState(() {
       statusText = "";
+      _scrollController.animateTo(
+        0.0,
+        curve: Curves.easeOut,
+        duration: const Duration(milliseconds: 300),
+      );
     });
   }
-
 
   List<String> actions = [
     "Initialize manually",
@@ -96,8 +91,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
     "Subscribe to topic",
     "Unsubscribe from topic",
     "Send simple notification",
-    "Send advanced notification",
-    "Initialize listeners"
+    "Send advanced notification"
   ];
 
   // All managing functions
@@ -111,7 +105,8 @@ class _PusheSampleState extends State<PusheSampleWidget> {
           bottom: PreferredSize(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(0, 0, 0, 2),
-                child: Text('Flutter plugin: 0.3.0| native version: 1.6.3', style: TextStyle(color: Colors.white)),
+                child: Text('Flutter plugin: 1.0.0 | native version: 1.6.3',
+                    style: TextStyle(color: Colors.white)),
               ),
               preferredSize: null),
         ),
@@ -125,17 +120,27 @@ class _PusheSampleState extends State<PusheSampleWidget> {
               flex: 8,
             ),
             Flexible(
-              child: SingleChildScrollView(
-                child: Container(
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor
-                    ),
-                    child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: GestureDetector(onDoubleTap: _clearStatus,child: Text(statusText, style: TextStyle(color: Colors.white))))
-                ),
+              child: Divider(
+                height: 16.0,
+                color: Colors.blueGrey,
               ),
-              flex: 2,
+              flex: 1,
+            ),
+            Flexible(
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                reverse: true,
+                child: Container(
+                    decoration:
+                        BoxDecoration(color:Colors.white),
+                    child: Padding(
+                        padding: EdgeInsets.all(4.0),
+                        child: GestureDetector(
+                            onDoubleTap: _clearStatus,
+                            child: Text(statusText,
+                                style: TextStyle(color: Colors.blue))))),
+              ),
+              flex: 6,
             )
           ],
         ));
@@ -160,9 +165,8 @@ class _PusheSampleState extends State<PusheSampleWidget> {
                     child: Center(
                         child: Text(itemText,
                             style: TextStyle(
-                                color: Theme.of(context).primaryColor ,
-                                fontSize: 15.0
-                            )
+                                color: Theme.of(context).primaryColor,
+                                fontSize: 15.0)
                         )
                     )
                 ),

@@ -31,9 +31,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
         <meta-data
             android:name="co.ronash.pushe.token"
-            android:value="PUSHE_29715345458" />
+            android:value="PUSHE_{YOUR_TOKEN}" />
     </application>
 </manifest>

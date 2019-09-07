@@ -46,31 +46,35 @@ class Pushe {
   static Future<void> sendSimpleNotifToUser(String pusheId, String title, String content) async => _channel.invokeMethod("Pushe#sendSimpleNotifToUser", {"pusheId":pusheId, "title":title, "content":content});
 
   /// To send a JSON formatted advanced notification to another device using it's PusheId
-  static Future<void> sendAdvancedNotifToUser(String pusheId, String notificationJson) async => _channel.invokeMethod("Pushe#sendSimpleNotifToUser", {"pusheId":pusheId, "json":notificationJson});
+  static Future<void> sendAdvancedNotifToUser(String pusheId, String notificationJson) async => _channel.invokeMethod("Pushe#sendAdvancedNotifToUser", {"pusheId":pusheId, "json":notificationJson});
 
-  /// If you want to receive callbacks when notification is received/clicked/dismissed/button clicked or custom content is received,
-  /// you call this function to let the plugin initialize callback receivers.
-  /// [withManifestOverrode]: If set to false it will manually register the receiver, (default choice)
-  /// If set to true, you must have added PusheApplication as your application class in the manifest or you have called
-  /// [PusheApplication.initializeNotificationListeners(context.getApplicationContext())] in your application#onCreate.
-  /// Chance of getting callback using application class (When app is closed) is more than normal callbacks.
-  /// If you use normal callbacks you have to call this method every time to add listener.
-  ///
-  /// **NOTE**: If you have modified your AndroidManifest, PASS true to this example, otherwise **you might get the callbacks twice.**
-  static Future<void> initializeNotificationListeners({bool withManifestOverrode:false}) async {
+  /// Set callbacks for different types of events for notifications (in foreground or when app is open in the background)
+  /// [onReceived] is called when notification was received.
+  /// [onClicked] is called when notification was clicked.
+  /// [onDismissed] is called when notification was swiped away.
+  /// [onButtonClicked] is called when notification contains button and a button was clicked.
+  /// [onCustomContentReceived] is called when notification includes custom json. It will a json in string format.
+  /// [applicationOverridden] : If you have added [android:name="co.ronash.pushe.flutter.PusheApplication"] to your AndroidManifest application attribute,
+  /// the callbacks will be callable since user starts the app. But if not, callbacks will be available when you call [setNotificationListener] and before that callbacks won't work.
+  /// This doesn't make so much difference. But in future case when Flutter added background fcm support, this can make difference.
+  static setNotificationListener({
+    Function(NotificationData) onReceived,
+    Function(NotificationData) onClicked,
+    Function(NotificationData) onDismissed,
+    Function(NotificationData, NotificationButtonData) onButtonClicked,
+    Function(String) onCustomContentReceived,
+    bool applicationOverridden: false
+  }) {
+    _receiveCallback = onReceived;
+    _clickCallback = onClicked;
+    _dismissCallback = onDismissed;
+    _buttonClickCallback = onButtonClicked;
+    _customContentCallback = onCustomContentReceived;
     _channel.setMethodCallHandler(_handleMethod);
-    if (!withManifestOverrode) {
+    if (!applicationOverridden) {
       _channel.invokeMethod("Pushe#initNotificationListenerManually");
     }
   }
-
-  // callbacks
-  static setOnNotificationReceived(Function(NotificationData) f) => _receiveCallback = f;
-  static setOnNotificationClicked(Function(NotificationData) f) => _clickCallback = f;
-  static setOnNotificationButtonClicked(Function(NotificationData, NotificationButtonData) f) => _buttonClickCallback = f;
-  static setOnNotificationCustomContentReceived(Function(String) f) => _customContentCallback = f;
-  static setOnNotificationDismissed(Function(NotificationData) f) => _dismissCallback = f;
-
 
 
   ///

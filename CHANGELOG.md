@@ -1,3 +1,15 @@
+## 1.0.0
+
+* Release ready version.
+
+* New listener API for notification callbacks.
+
+* Removed extra files and APIs.
+
+* Remove extra Fcm service. Firebase and other services can now be added and supported natively.
+
+* Minor improvements and bug fixes.
+
 ## 0.9.1
 
 * Recreating notification callbacks. Callbacks will return actual notification objects now.

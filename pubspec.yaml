@@ -1,6 +1,6 @@
 name: pushe
 description: A plugin implementing functionality of Pushe Android SDK. Refer to pushe.co for further details about Pushe.
-version: 0.9.1
+version: 1.0.0
 author: Pusheco <mahdi.malvandi@pushe.co>
 homepage: https://pushe.co
 
