@@ -9,7 +9,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="pushe_example"
+        android:label="Pushe Flutter"
         android:icon="@mipmap/ic_launcher"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <activity
@@ -33,6 +33,6 @@
         </activity>
         <meta-data
             android:name="co.ronash.pushe.token"
-            android:value="PUSHE_{YOUR_TOKEN}" />
+            android:value="PUSHE_15414484556" />
     </application>
 </manifest>
