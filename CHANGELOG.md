@@ -1,3 +1,9 @@
+## 1.0.1
+
+* Fix problem with AndroidX projects.
+
+* Changed example package name.
+
 ## 1.0.0
 
 * Release ready version.

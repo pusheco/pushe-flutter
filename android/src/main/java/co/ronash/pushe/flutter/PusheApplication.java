@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.util.Pair;
 import org.json.JSONObject;
 import co.ronash.pushe.NotificationButtonData;
@@ -25,22 +24,22 @@ public class PusheApplication extends FlutterApplication {
         final Context c = context.getApplicationContext();
         Pushe.setNotificationListener(new Pushe.NotificationListener() {
             @Override
-            public void onNotificationReceived(@NonNull final NotificationData notificationData) {
+            public void onNotificationReceived(final NotificationData notificationData) {
                 sendBroadcastOnMainThread(c,
                         c.getPackageName() + ".NOTIFICATION_RECEIVED",
                         Pair.create("data", notificationData.toString()));
             }
 
             @Override
-            public void onNotificationClicked(@NonNull final NotificationData notificationData) {
+            public void onNotificationClicked(final NotificationData notificationData) {
                 sendBroadcastOnMainThread(c,
                         c.getPackageName() + ".NOTIFICATION_CLICKED",
                         Pair.create("data", notificationData.toString()));
             }
 
             @Override
-            public void onNotificationButtonClicked(@NonNull final NotificationData notificationData,
-                                                    @NonNull final NotificationButtonData notificationButtonData) {
+            public void onNotificationButtonClicked(final NotificationData notificationData,
+                                                    final NotificationButtonData notificationButtonData) {
                 sendBroadcastOnMainThread(c,
                         c.getPackageName() + ".NOTIFICATION_BUTTON_CLICKED",
                         Pair.create("data", notificationData.toString()),
@@ -48,14 +47,14 @@ public class PusheApplication extends FlutterApplication {
             }
 
             @Override
-            public void onCustomContentReceived(@NonNull final JSONObject jsonObject) {
+            public void onCustomContentReceived(final JSONObject jsonObject) {
                 sendBroadcastOnMainThread(c,
                         c.getPackageName() + ".NOTIFICATION_CUSTOM_CONTENT_RECEIVED",
                         Pair.create("json", jsonObject.toString()));
             }
 
             @Override
-            public void onNotificationDismissed(@NonNull final NotificationData notificationData) {
+            public void onNotificationDismissed(final NotificationData notificationData) {
                 sendBroadcastOnMainThread(c,
                         c.getPackageName() + ".NOTIFICATION_DISMISSED",
                         Pair.create("data", notificationData.toString()));

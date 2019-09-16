@@ -4,13 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.annotation.NonNull;
-
 import org.json.JSONException;
-import org.json.JSONObject;
-
-import co.ronash.pushe.NotificationButtonData;
-import co.ronash.pushe.NotificationData;
 import co.ronash.pushe.Pushe;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -46,7 +40,7 @@ public class PushePlugin implements MethodCallHandler {
     }
 
     @Override
-    public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+    public void onMethodCall(MethodCall call, Result result) {
         String methodName = call.method;
         switch (methodName) {
             case "Pushe#initialize":

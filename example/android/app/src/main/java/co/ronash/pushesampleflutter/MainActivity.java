@@ -1,4 +1,4 @@
-package co.ronash.pushe_example;
+package co.ronash.pushesampleflutter;
 
 import android.os.Bundle;
 

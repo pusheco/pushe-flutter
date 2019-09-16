@@ -1,4 +1,4 @@
-package co.ronash.pushe_example;
+package co.ronash.pushesampleflutter;
 
 // To make this work add firebase_messaging to your flutter app.
 
