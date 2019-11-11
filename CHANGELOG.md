@@ -1,3 +1,8 @@
+## 1.1.0-alpha1
+
+* Fixed Battery usage issue
+* Added method `isNotificationOn`
+
 ## 1.0.1
 
 * Fix problem with AndroidX projects.

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import org.json.JSONException;
 import co.ronash.pushe.Pushe;
+import co.ronash.pushe.util.InvalidJsonException;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -80,6 +81,9 @@ public class PushePlugin implements MethodCallHandler {
             case "Pushe#setNotificationOn":
                 Pushe.setNotificationOn(context);
                 break;
+            case "Pushe#isNotificationOn":
+                result.success(Pushe.isNotificationOn(context));
+                break;
             case "Pushe#isPusheInitialized":
                 result.success(Pushe.isPusheInitialized(context));
                 break;
@@ -101,7 +105,7 @@ public class PushePlugin implements MethodCallHandler {
                                 (String) call.argument("pusheId"),
                                 (String) call.argument("json"));
                         result.success("Will send advanced notification");
-                    } catch (JSONException e) {
+                    } catch (InvalidJsonException e) {
                         result.error("Invalid json entered", null, null);
                     } catch (Exception c) {
                         result.error("Something bad happened.", null, null);

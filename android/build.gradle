@@ -14,13 +14,9 @@ buildscript {
 
 rootProject.allprojects {
     repositories {
-        mavenLocal()
+        maven { url("https://dl.bintray.com/pushe/preview") }
         google()
         jcenter()
-        flatDir {
-            dirs project(':pushe').file('libs')
-            // e.g. dirs project(':url_launcher').file('libs')  - don't miss the ':'
-        }
     }
 }
 
@@ -39,10 +35,5 @@ android {
 }
 
 dependencies {
-    api (name: 'pushelib-releaseForBintray', ext: 'aar')
-//    implementation ('com.google.android.gms:play-services-location:16.0.0')
-    implementation ('com.google.android.gms:play-services-gcm:16.0.0')
-    implementation ('com.google.android.gms:play-services-ads:16.0.0')
-    implementation ('com.evernote:android-job:1.2.6')
-    implementation 'com.google.firebase:firebase-messaging:17.4.0'
+    implementation ("co.ronash.android:pushe-base:1.7.0-alpha3")
 }

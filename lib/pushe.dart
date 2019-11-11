@@ -39,6 +39,8 @@ class Pushe {
   /// Default of notification is set to On, if you have set it off, you can revert it using this function.
   static Future<void> setNotificationOn() async => _channel.invokeMethod("Pushe#setNotificationOn");
 
+  static Future<bool> isNotificationOn() async => _channel.invokeMethod("Pushe#isNotificationOn");
+
   /// Check if Pushe is registered to server or not. This method is not completely reliable.
   static Future<bool> isPusheInitialized() async => await _channel.invokeMethod("Pushe#isPusheInitialized");
 
