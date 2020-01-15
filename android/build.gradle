@@ -17,6 +17,7 @@ rootProject.allprojects {
         maven { url("https://dl.bintray.com/pushe/preview") }
         google()
         jcenter()
+        mavenLocal()
     }
 }
 
@@ -35,5 +36,5 @@ android {
 }
 
 dependencies {
-    implementation ("co.ronash.android:pushe-base:1.7.0-alpha3")
+    implementation ("co.pushe.plus:base:2.0.2")
 }

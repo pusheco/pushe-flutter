@@ -24,34 +24,32 @@ class _PusheSampleState extends State<PusheSampleWidget> {
 
     switch (actions.indexOf(text)) {
       case 0:
-        result = "Initialize Pushe";
-        Pushe.initialize(showDialog: true);
+        result = 'Pushe id: ${await Pushe.getAndroidId()}';
         break;
       case 1:
-        result = 'Pushe id: ${await Pushe.getPusheId()}';
+        result = "Is Pushe initialized: " +
+            (await Pushe.isInitialized()).toString();
         break;
       case 2:
-        result = "Is Pushe initialized: " +
-            (await Pushe.isPusheInitialized()).toString();
-        break;
-      case 3:
         result = "Subscribe to topic: sport";
         Pushe.subscribe('sport');
         break;
-      case 4:
+      case 3:
         result = "Unsubscribe from topic: sport";
         Pushe.unsubscribe('sport');
         break;
+      case 4:
+        result = 'Sending simple notification with title:"title1",content:"content1"';
+        Pushe.sendNotificationToUser(
+            await Pushe.getAndroidId(), 'title1', 'content1');
+        break;
       case 5:
-        result = 'Sending simple notification with title:"title1",content:"content1"}';
-        Pushe.sendSimpleNotifToUser(
-            await Pushe.getPusheId(), 'title1', 'content1');
+        result = 'Sending event with name:"name1"';
+        Pushe.sendEvent('name 1');
         break;
       case 6:
-        result =
-            'Send advanced notification with json: {"title":"title1","content":"content1"}';
-        Pushe.sendAdvancedNotifToUser(await Pushe.getPusheId(),
-            '{"title":"title1","content":"content1"}');
+        result = 'Sending ecomment with name:"product1",price:"100"';
+        Pushe.sendEcommerceData('product1',100);
         break;
       default:
         result = text;
@@ -85,14 +83,14 @@ class _PusheSampleState extends State<PusheSampleWidget> {
   }
 
   List<String> actions = [
-    "Initialize manually",
     "Get Pushe ID",
     "Check initialization",
     "Subscribe to topic",
     "Unsubscribe from topic",
-    "Send simple notification",
-    "Send advanced notification"
-  ];
+    "Send notification",
+    "Send Event",
+    "Send Ecommerce Data"
+      ];
 
   // All managing functions
 

@@ -32,7 +32,7 @@
             </intent-filter>
         </activity>
         <meta-data
-            android:name="co.ronash.pushe.token"
-            android:value="PUSHE_15414484556" />
+            android:name="pushe_token"
+            android:value="Y28ucm9uYXNoLnB1c2hlc2FtcGxlZmx1dHRlckB4Z2RAMTU0MTQ0ODQ1NTY=" />
     </application>
 </manifest>
