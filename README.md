@@ -16,7 +16,7 @@ Add the plugin to `pubspec.yaml`:
 dependencies:
   pushe: ^version
 ```
-<img src="https://img.shields.io/github/release/pusheco/flutter-sample"></img>
+<img src="https://img.shields.io/badge/release-v1.2-blue"></img>
 
 Then run `flutter packages get` to sync the libraries.
 
