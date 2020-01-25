@@ -16,7 +16,7 @@ Add the plugin to `pubspec.yaml`:
 dependencies:
   pushe: ^version
 ```
-<img src="https://img.shields.io/github/release/pusheco/flutter-sample"></img>
+<img src="https://img.shields.io/badge/release-v1.2-blue"></img>
 
 Then run `flutter packages get` to sync the libraries.
 
@@ -25,8 +25,8 @@ Then run `flutter packages get` to sync the libraries.
 Go to https://console.pushe.co , create an application with the same package name and get the manifest tag. Add the manifest tag in the `Application` tag. It should be something like this:
 
 ```xml
-<meta-data android:name="co.ronash.pushe.token"
-           android:value="PUSHE_12345678" />
+<meta-data android:name="pushe_token"
+           android:value="PUSHE_TOKEN" />
 ```
 
 ### Add the code snippets
@@ -35,10 +35,6 @@ In your `main.dart`:
 
 ```dart
 import 'package:pushe/pushe.dart';
-```
-
-```dart
-Pushe.initialize();
 ```
 
 ## More Info
