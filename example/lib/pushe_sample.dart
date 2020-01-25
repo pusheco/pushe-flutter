@@ -31,23 +31,27 @@ class _PusheSampleState extends State<PusheSampleWidget> {
             (await Pushe.isInitialized()).toString();
         break;
       case 2:
+        result = "Is Pushe registered: " +
+            (await Pushe.isRegistered()).toString();
+        break;
+      case 3:
         result = "Subscribe to topic: sport";
         Pushe.subscribe('sport');
         break;
-      case 3:
+      case 4:
         result = "Unsubscribe from topic: sport";
         Pushe.unsubscribe('sport');
         break;
-      case 4:
+      case 5:
         result = 'Sending simple notification with title:"title1",content:"content1"';
         Pushe.sendNotificationToUser(
             await Pushe.getAndroidId(), 'title1', 'content1');
         break;
-      case 5:
+      case 6:
         result = 'Sending event with name:"name1"';
         Pushe.sendEvent('name 1');
         break;
-      case 6:
+      case 7:
         result = 'Sending ecomment with name:"product1",price:"100"';
         Pushe.sendEcommerceData('product1',100);
         break;
@@ -85,6 +89,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
   List<String> actions = [
     "Get Pushe ID",
     "Check initialization",
+    "Check registeration",
     "Subscribe to topic",
     "Unsubscribe from topic",
     "Send notification",

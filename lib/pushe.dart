@@ -41,8 +41,11 @@ class Pushe {
 
   static Future<bool> isNotificationOn() async => _channel.invokeMethod("Pushe#isNotificationOn");
 
-  /// Check if Pushe is registered to server or not. This method is not completely reliable.
+  /// Check if Pushe is initialized to server or not. 
   static Future<bool> isInitialized() async => await _channel.invokeMethod("Pushe#isInitialized");
+
+    /// Check if Pushe is registered to server or not. 
+  static Future<bool> isRegistered() async => await _channel.invokeMethod("Pushe#isRegistered");
 
   /// To send a simple notification to another user using his/her PusheId
   static Future<void> sendNotificationToUser(String androidId, String title, String content) async => _channel.invokeMethod("Pushe#sendNotificationToUser", {"androidId":androidId, "title":title, "content":content});

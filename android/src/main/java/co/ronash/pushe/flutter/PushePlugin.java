@@ -81,6 +81,9 @@ public class PushePlugin implements MethodCallHandler {
             case "Pushe#isInitialized":
                 result.success(Pushe.isInitialized());
                 break;
+            case "Pushe#isRegistered":
+                result.success(Pushe.isRegistered());
+                break;
             case "Pushe#sendNotificationToUser":
                 if (call.hasArgument("androidId")
                         && call.hasArgument("title")
