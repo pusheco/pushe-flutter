@@ -66,8 +66,14 @@ public class PushePlugin implements MethodCallHandler {
             case "Pushe#unsubscribe":
                 if (call.hasArgument("topic")) {
                     String topic = call.argument("topic");
-                    Pushe.unsubscribeFromTopic( topic);
-                    result.success("Will unsubscribe from topic " + topic);
+                    Pushe.unsubscribeFromTopic( topic, new Pushe.Callback() {
+                        @Override
+                        public void onComplete() {
+                            // Done
+                            result.success(true);
+                        }
+                    });
+
                 } else {
                     result.error("404", "Failed to unsubscribe. No topic provided.", null);
                 }

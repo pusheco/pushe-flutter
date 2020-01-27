@@ -36,11 +36,26 @@ class _PusheSampleState extends State<PusheSampleWidget> {
         break;
       case 3:
         result = "Subscribe to topic: sport";
-        Pushe.subscribe('sport');
+        Pushe.subscribe('sport',callback:(output) {
+          if (output) setState(() {
+            statusText =
+            '$statusText \n --------------- \n Successfully subscribed to topic sport \n ${DateTime
+                .now()}';
+          });
+        });
+
         break;
       case 4:
         result = "Unsubscribe from topic: sport";
-        Pushe.unsubscribe('sport');
+        Pushe.unsubscribe('sport',callback:(output) {
+          if (output) setState(() {
+            statusText =
+            '$statusText \n --------------- \n Successfully unsubscribed from topic sport \n ${DateTime
+                .now()}';
+          });
+        });
+
+
         break;
       case 5:
         result = 'Sending simple notification with title:"title1",content:"content1"';
