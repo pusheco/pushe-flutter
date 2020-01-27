@@ -15,6 +15,10 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.view.FlutterMain;
+import java.util.Map;
+import java.util.List;
+
+
 
 /**
  * PushePlugin
@@ -49,6 +53,53 @@ public class PushePlugin implements MethodCallHandler {
             case "Pushe#getAndroidId":
                 result.success(Pushe.getAndroidId());
                 break;
+
+            case "Pushe#getGoogleAdvertisingId":
+                result.success(Pushe.getGoogleAdvertisingId());
+                break;
+
+            case "Pushe#getCustomId":
+                result.success(Pushe.getCustomId());
+                break;
+
+            case "Pushe#setCustomId":
+                if (call.hasArgument("id")) {
+                    String id = call.argument("id");
+                    Pushe.setCustomId(id);
+                    result.success("Will set custom id " + id);
+                } else {
+                    result.error("404", "Failed to set custom id. No id provided.", null);
+                }
+                break;
+
+            case "Pushe#getUserEmail":
+                result.success(Pushe.getUserEmail());
+                break;
+
+            case "Pushe#setUserEmail":
+                if (call.hasArgument("email")) {
+                    String email = call.argument("email");
+                    Pushe.setUserEmail(email);
+                    result.success("Will set user email to " + email);
+                } else {
+                    result.error("404", "Failed to set email. No email provided.", null);
+                }
+                break;
+
+            case "Pushe#getUserPhoneNumber":
+                result.success(Pushe.getUserPhoneNumber());
+                break;
+
+            case "Pushe#setUserPhoneNumber":
+                if (call.hasArgument("phone")) {
+                    String phone = call.argument("phone");
+                    Pushe.setUserPhoneNumber(phone);
+                    result.success("Will set user phone to " + phone);
+                } else {
+                    result.error("404", "Failed to set phone. No phone provided.", null);
+                }
+                break;
+
             case "Pushe#subscribe":
                 if (call.hasArgument("topic")) {
                     final String topic = call.argument("topic");
@@ -122,11 +173,74 @@ public class PushePlugin implements MethodCallHandler {
                 } else {
                     result.error("404", "Failed to send ecommerce data. No event name and price provided.", null);
                 }
+
                 break;
             case "Pushe#initNotificationListenerManually":
                 initNotificationListenerManually();
                 break;
-            
+
+            case "Pushe#setRegistrationCompleteListener":
+
+                Pushe.setRegistrationCompleteListener(new Pushe.Callback() {
+                    @Override
+                    public void onComplete() {
+                        // Done
+                        result.success(true);
+                    }
+                } );
+                break;
+
+            case "Pushe#setInitializationCompleteListener":
+                Pushe.setInitializationCompleteListener(new Pushe.Callback() {
+                    @Override
+                    public void onComplete() {
+                        // Done
+                        result.success(true);
+                    }
+                } );
+                break;
+
+            case "Pushe#addTags":
+                if (call.hasArgument("tags") && call.argument("tags") instanceof Map) {
+                    Map tags = call.argument("tags");
+                    Pushe.addTags( tags, new Pushe.Callback() {
+                        @Override
+                        public void onComplete() {
+                            // Done
+                            result.success(true);
+                        }
+                    });
+
+                } else {
+                    result.error("404", "Failed to add tags. No tags provided.", null);
+                }
+                break;
+
+            case "Pushe#removeTags":
+                if (call.hasArgument("tags") && call.argument("tags") instanceof List) {
+                    List tags = call.argument("tags");
+                    Pushe.removeTags( tags, new Pushe.Callback() {
+                        @Override
+                        public void onComplete() {
+                            // Done
+                            result.success(true);
+                        }
+                    });
+
+                } else {
+                    result.error("404", "Failed to remove tags. No tags provided.", null);
+                }
+                break;
+
+            case "Pushe#getSubscribedTags":
+                result.success(Pushe.getSubscribedTags());
+                break;
+
+            case "Pushe#getSubscribedTopics":
+                result.success(Pushe.getSubscribedTopics());
+                break;
+
+
             default:
                 result.notImplemented();
                 break;
