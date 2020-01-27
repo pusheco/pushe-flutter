@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="co.ronash.pushesampleflutter">
+    package="co.pushe.pushesampleflutter">
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
@@ -13,7 +13,7 @@
         android:icon="@mipmap/ic_launcher"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <activity
-            android:name="co.ronash.pushesampleflutter.MainActivity"
+            android:name="co.pushe.pushesampleflutter.MainActivity"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
@@ -33,6 +33,6 @@
         </activity>
         <meta-data
             android:name="pushe_token"
-            android:value="Y28ucm9uYXNoLnB1c2hlc2FtcGxlZmx1dHRlckB4Z2RAMTU0MTQ0ODQ1NTY=" />
+            android:value="OWdsNjQxeDV6cHJycjNxZ0Brb2xAMTU0MTQ0ODQ1NTY=" />
     </application>
 </manifest>

@@ -28,7 +28,10 @@ class Pushe {
 
   /// Subscribe to a topic.
   /// [topic] is the name of that topic. The naming rules must follow FCM topic naming standards.
-  static Future<void> subscribe(String topic) async => _channel.invokeMethod("Pushe#subscribe", {"topic":topic});
+  static Future<void> subscribe(String topic, {Function(bool) f}) async {
+    var result = await _channel.invokeMethod("Pushe#subscribe", {"topic":topic});
+    f?.call(result);
+  }
 
   /// Unsubscribe from a topic already subscribed.
   static Future<void> unsubscribe(String topic) async => _channel.invokeMethod("Pushe#unsubscribe", {"topic":topic});
@@ -66,7 +69,7 @@ class Pushe {
   /// [onDismissed] is called when notification was swiped away.
   /// [onButtonClicked] is called when notification contains button and a button was clicked.
   /// [onCustomContentReceived] is called when notification includes custom json. It will a json in string format.
-  /// [applicationOverridden] : If you have added [android:name="co.ronash.pushe.flutter.PusheApplication"] to your AndroidManifest application attribute,
+  /// [applicationOverridden] : If you have added [android:name="co.pushe.plus.flutter.PusheApplication"] to your AndroidManifest application attribute,
   /// the callbacks will be callable since user starts the app. But if not, callbacks will be available when you call [setNotificationListener] and before that callbacks won't work.
   /// This doesn't make so much difference. But in future case when Flutter added background fcm support, this can make difference.
   static setNotificationListener({

@@ -1,11 +1,9 @@
-package co.ronash.pushe.flutter;
+package co.pushe.plus.flutter;
 
-import android.app.NotificationChannel;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import org.json.JSONException;
 
 import co.pushe.plus.Pushe;
 import co.pushe.plus.notification.PusheNotification;
@@ -45,7 +43,7 @@ public class PushePlugin implements MethodCallHandler {
     }
 
     @Override
-    public void onMethodCall(MethodCall call, Result result) {
+    public void onMethodCall(MethodCall call, final Result result) {
         String methodName = call.method;
         switch (methodName) {
             case "Pushe#getAndroidId":
@@ -53,9 +51,14 @@ public class PushePlugin implements MethodCallHandler {
                 break;
             case "Pushe#subscribe":
                 if (call.hasArgument("topic")) {
-                    String topic = call.argument("topic");
-                    Pushe.subscribeToTopic( topic);
-                    result.success("Will subscribe to topic " + topic);
+                    final String topic = call.argument("topic");
+                    Pushe.subscribeToTopic(topic, new Pushe.Callback() {
+                        @Override
+                        public void onComplete() {
+                            // Done
+                            result.success(true);
+                        }
+                    });
                 } else {
                     result.error("404", "Failed to subscribe. No topic argument is passed", null);
                 }

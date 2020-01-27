@@ -1,3 +1,10 @@
+## 2.0.0
+
+* Migrate to the new Plus sdk of Pushe
+* Get used of new Plus features in the SDK
+* No initialization is needed for the library
+> Notice the `setNotificationListener` is not fully reliable yet, since it does not handle background
+
 ## 1.1.0-alpha1
 
 * Fixed Battery usage issue

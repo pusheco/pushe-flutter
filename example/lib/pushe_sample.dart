@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pushe/pushe.dart';
+import 'package:pushe_flutter/pushe.dart';
 
 
 class PusheSampleWidget extends StatefulWidget {
@@ -108,7 +108,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
           bottom: PreferredSize(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(0, 0, 0, 2),
-                child: Text('Flutter plugin: 1.2 | native version: 2.0.2',
+                child: Text('Flutter plugin: 2.0.0 | native version: 2.0.4',
                     style: TextStyle(color: Colors.white)),
               ),
               preferredSize: null),
@@ -125,7 +125,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
             Flexible(
               child: Divider(
                 height: 16.0,
-                color: Colors.blueGrey,
+                color: Colors.blue,
               ),
               flex: 1,
             ),
