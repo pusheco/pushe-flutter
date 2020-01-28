@@ -1,3 +1,8 @@
+## 2.0.1
+
+- Fix formatting of plugin
+- Minor improvements
+
 ## 2.0.0
 
 * Migrate to the new Plus sdk of Pushe
