@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.Pair;
 
@@ -38,35 +37,35 @@ public class PusheApplication extends FlutterApplication {
         }
         pusheNotification.setNotificationListener(new PusheNotificationListener() {
             @Override
-            public void onNotification(@NonNull NotificationData notificationData) {
+            public void onNotification(NotificationData notificationData) {
                 sendBroadcastOnMainThread(c,
                 c.getPackageName() + ".NOTIFICATION_RECEIVED",
                 Pair.create("data", notificationDataJson(notificationData).toString()));
             }
 
             @Override
-            public void onCustomContentNotification(@NonNull Map<String, Object> customContent) {
+            public void onCustomContentNotification(Map<String, Object> customContent) {
                 sendBroadcastOnMainThread(c,
                 c.getPackageName() + ".NOTIFICATION_CUSTOM_CONTENT_RECEIVED",
                 Pair.create("json", new JSONObject(customContent).toString()));
             }
 
             @Override
-            public void onNotificationClick(@NonNull NotificationData notificationData) {
+            public void onNotificationClick(NotificationData notificationData) {
                 sendBroadcastOnMainThread(c,
                         c.getPackageName() + ".NOTIFICATION_CLICKED",
                         Pair.create("data", notificationDataJson(notificationData).toString()));
             }
 
             @Override
-            public void onNotificationDismiss(@NonNull NotificationData notificationData) {
+            public void onNotificationDismiss(NotificationData notificationData) {
                 sendBroadcastOnMainThread(c,
                 c.getPackageName() + ".NOTIFICATION_DISMISSED",
                         Pair.create("data", notificationDataJson(notificationData).toString()));
             }
 
             @Override
-            public void onNotificationButtonClick(@NonNull NotificationButtonData notificationButtonData, @NonNull NotificationData notificationData) {
+            public void onNotificationButtonClick(NotificationButtonData notificationButtonData, NotificationData notificationData) {
                 sendBroadcastOnMainThread(c,
                 c.getPackageName() + ".NOTIFICATION_BUTTON_CLICKED",
                         Pair.create("data", notificationDataJson(notificationData).toString()),

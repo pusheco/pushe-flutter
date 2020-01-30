@@ -24,6 +24,7 @@ import java.util.List;
  * PushePlugin
  *
  * #author Mahdi Malvandi
+ * FIXME: Warnings will be repaired with the next release
  */
 public class PushePlugin implements MethodCallHandler {
 

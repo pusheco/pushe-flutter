@@ -1,3 +1,7 @@
+## 2.0.2
+
+- Fix issue with AndroidX
+
 ## 2.0.1
 
 - Fix formatting of plugin
