@@ -7,9 +7,11 @@ import android.os.Looper;
 import android.util.Log;
 import android.util.Pair;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.Map;
 
 import co.pushe.plus.Pushe;
@@ -39,35 +41,35 @@ public class PusheApplication extends FlutterApplication {
             @Override
             public void onNotification(NotificationData notificationData) {
                 sendBroadcastOnMainThread(c,
-                c.getPackageName() + ".NOTIFICATION_RECEIVED",
+                c.getPackageName() + ".nr",
                 Pair.create("data", notificationDataJson(notificationData).toString()));
             }
 
             @Override
             public void onCustomContentNotification(Map<String, Object> customContent) {
                 sendBroadcastOnMainThread(c,
-                c.getPackageName() + ".NOTIFICATION_CUSTOM_CONTENT_RECEIVED",
+                c.getPackageName() + ".nccr",
                 Pair.create("json", new JSONObject(customContent).toString()));
             }
 
             @Override
             public void onNotificationClick(NotificationData notificationData) {
                 sendBroadcastOnMainThread(c,
-                        c.getPackageName() + ".NOTIFICATION_CLICKED",
+                        c.getPackageName() + ".nc",
                         Pair.create("data", notificationDataJson(notificationData).toString()));
             }
 
             @Override
             public void onNotificationDismiss(NotificationData notificationData) {
                 sendBroadcastOnMainThread(c,
-                c.getPackageName() + ".NOTIFICATION_DISMISSED",
+                c.getPackageName() + ".nd",
                         Pair.create("data", notificationDataJson(notificationData).toString()));
             }
 
             @Override
             public void onNotificationButtonClick(NotificationButtonData notificationButtonData, NotificationData notificationData) {
                 sendBroadcastOnMainThread(c,
-                c.getPackageName() + ".NOTIFICATION_BUTTON_CLICKED",
+                c.getPackageName() + ".nbc",
                         Pair.create("data", notificationDataJson(notificationData).toString()),
                     Pair.create("button", notificationButtonDataJson(notificationButtonData).toString()));
             }
@@ -108,6 +110,11 @@ public class PusheApplication extends FlutterApplication {
             } catch (Exception e) {
                 Log.d("Pushe", "Failed to add customContent to notification content", e);
             }
+            try {
+                o.put("buttons", notificationButtonDataList(data.getButtons()));
+            } catch (Exception e) {
+                Log.w("Pushe", "Failed to parse notification buttons");
+            }
             return o;
         } catch (JSONException e) {
             Log.w("Pushe", "Failed to parse notification and convert it to Json.", e);
@@ -128,6 +135,14 @@ public class PusheApplication extends FlutterApplication {
             Log.w("Pushe", "Failed to parse notification and convert it to Json.", e);
             return null;
         }
+    }
+
+    public static JSONArray notificationButtonDataList(List<NotificationButtonData> buttons) {
+        JSONArray jA = new JSONArray();
+        for (NotificationButtonData i : buttons) {
+            jA.put(notificationButtonDataJson(i));
+        }
+        return jA;
     }
 
 }

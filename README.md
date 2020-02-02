@@ -14,10 +14,8 @@ Add the plugin to `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  pushe: ^version
+  pushe: ^latest
 ```
-<img src="https://img.shields.io/badge/release-v1.2-blue"></img>
-
 Then run `flutter packages get` to sync the libraries.
 
 ### Set up credentials
@@ -28,6 +26,8 @@ Go to https://console.pushe.co , create an application with the same package nam
 <meta-data android:name="pushe_token"
            android:value="PUSHE_TOKEN" />
 ```
+
+Run the project after and you should be able to see your device in [console](https://console.pushe.co) after a short time.
 
 ### Add the code snippets
 
