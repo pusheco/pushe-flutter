@@ -1,3 +1,11 @@
+## 2.0.3
+
+- Fix bug in notification listeners
+- Improve `sendNotificationToUser` to support multiple IDs
+- Function callbacks will have no boolean status anymore, since there was no false status
+- Code style improvements
+- Example project improvements
+
 ## 2.0.2
 
 - Fix issue with AndroidX

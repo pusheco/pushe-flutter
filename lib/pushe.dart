@@ -4,6 +4,16 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 
 ///
+/// Enum: Notification id type
+/// @author Mahdi Malvandi
+///
+enum IdType {
+  AndroidId,
+  GoogleAdvertisingId,
+  CustomId
+}
+
+///
 /// @author Mahdi Malvandi
 /// Main plugin class handling most of SDK's works.
 ///
@@ -32,7 +42,7 @@ class Pushe {
 
   /// Set custom id
   static Future<void> setCustomId(String id) async =>
-      _channel.invokeMethod("Pushe.setCustomId", {"id": id});
+      await _channel.invokeMethod("Pushe.setCustomId", {"id": id});
 
   /// Get email
   static Future<String> getUserEmail() async =>
@@ -40,7 +50,7 @@ class Pushe {
 
   /// Set email
   static Future<void> setUserEmail(String email) async =>
-      _channel.invokeMethod("Pushe.setUserEmail", {"email": email});
+      await _channel.invokeMethod("Pushe.setUserEmail", {"email": email});
 
   /// Get user phone number
   static Future<String> getUserPhoneNumber() async =>
@@ -48,23 +58,26 @@ class Pushe {
 
   /// Set user phone number
   static Future<void> setUserPhoneNumber(String phone) async =>
-      _channel.invokeMethod("Pushe.setUserPhoneNumber", {"phone": phone});
+      await _channel.invokeMethod("Pushe.setUserPhoneNumber", {"phone": phone});
 
   /// Add tags.
   /// [tags] key-value pairs
   /// [callback] is an optional function that will be called with result of adding tags.
-  static Future<void> addTags(Map tags, {Function(bool) callback}) async {
-    var result = await _channel.invokeMethod("Pushe.addTags", {"tags": tags});
-    callback?.call(result);
+  static Future<void> addTags(Map<String, String> tags, {Function callback}) async {
+    if (await _channel.invokeMethod("Pushe.addTags", {"tags": tags})) {
+      callback?.call();
+    }
+    return;
   }
 
   /// Remove tags.
   /// [tags] list of tag keys to remove
   /// [callback] is an optional function that will be called with result of removing tags.
-  static Future<void> removeTags(List tags, {Function(bool) callback}) async {
-    var result =
-        await _channel.invokeMethod("Pushe.removeTags", {"tags": tags});
-    callback?.call(result);
+  static Future<void> removeTags(List<String> tags, {Function callback}) async {
+    if (await _channel.invokeMethod("Pushe.removeTags", {"tags": tags})) {
+      callback?.call();
+    }
+    return;
   }
 
   /// Get subscribed tags
@@ -78,32 +91,34 @@ class Pushe {
   /// Subscribe to a topic.
   /// [topic] is the name of that topic. The naming rules must follow FCM topic naming standards.
   /// [callback] is an optional function that will be called with result of subscription.
-  static Future<void> subscribe(String topic, {Function(bool) callback}) async {
-    var result =
-        await _channel.invokeMethod("Pushe.subscribe", {"topic": topic});
-    callback?.call(result);
+  static Future<void> subscribe(String topic, {Function callback}) async {
+    if (await _channel.invokeMethod("Pushe.subscribe", {"topic": topic})) {
+      callback?.call();
+    }
+    return;
   }
 
   /// Unsubscribe from a topic already subscribed.
   /// [topic] is the name of that topic. The naming rules must follow FCM topic naming standards.
   /// [callback] is an optional function that will be called with result of Unsubscription.
   static Future<void> unsubscribe(String topic,
-      {Function(bool) callback}) async {
-    var result =
-        await _channel.invokeMethod("Pushe.unsubscribe", {"topic": topic});
-    callback?.call(result);
+      {Function callback}) async {
+    if (await _channel.invokeMethod("Pushe.unsubscribe", {"topic": topic})) {
+      callback?.call();
+    }
+    return;
   }
 
   /// If this function is called, notification will not be shown.
   static Future<void> setNotificationOff() async =>
-      _channel.invokeMethod("Pushe.setNotificationOff");
+      await _channel.invokeMethod("Pushe.setNotificationOff");
 
   /// Default of notification is set to On, if you have set it off, you can revert it using this function.
   static Future<void> setNotificationOn() async =>
-      _channel.invokeMethod("Pushe.setNotificationOn");
+      await _channel.invokeMethod("Pushe.setNotificationOn");
 
   static Future<bool> isNotificationOn() async =>
-      _channel.invokeMethod("Pushe.isNotificationOn");
+      await _channel.invokeMethod("Pushe.isNotificationOn");
 
   /// Check if Pushe is initialized to server or not.
   static Future<bool> isInitialized() async =>
@@ -118,6 +133,7 @@ class Pushe {
     var result =
         await _channel.invokeMethod("Pushe.setRegistrationCompleteListener");
     if (result) callback?.call();
+    return;
   }
 
   /// Call it's callback when initialization is completed
@@ -126,24 +142,64 @@ class Pushe {
     var result =
         await _channel.invokeMethod("Pushe.setInitializationCompleteListener");
     if (result) callback?.call();
+    return;
   }
 
-  /// To send a simple notification to another user using his/her android Id
+  ///
+  /// Sending notification from this device to another device which is registered as a user of this app.
+  /// [type] is the type of unique id which you are passing
+  /// [id] is the id of the type [type]
+  /// [title] is the title of the notification
+  /// [content] is the content of the notification
+  /// [bigTitle] is the complete title of the notification
+  /// [bigContent] is the complete content of the notification
+  /// [imageUrl] is the url of the image which notification can contain
+  /// [iconUrl] is the url of the notification icon
+  /// [customContent] is the custom json you send along with the notification message which can be received as the notification customContent in the target device
   static Future<void> sendNotificationToUser(
-          String androidId, String title, String content) async =>
-      _channel.invokeMethod("Pushe.sendNotificationToUser",
-          {"androidId": androidId, "title": title, "content": content});
+      IdType type,
+      String id,
+      String title,
+      String content,
+      {String bigTitle, String bigContent, String imageUrl, String iconUrl, String notifIcon, dynamic customContent}
+      ) async {
+    String idType = type.toString();
+    await _channel.invokeMethod('Pushe.sendUserNotification', {
+      "type":idType,
+      "id":id,
+      "title":title,
+      "content":content,
+      "bigTitle":bigTitle,
+      "bigContent":bigContent,
+      "imageUrl":imageUrl,
+      "iconUrl":iconUrl,
+      "notifIcon":notifIcon,
+      "customContent":jsonEncode(customContent)
+    });
+    return;
+  }
+
+  static Future<void> sendAdvancedNotificationToUser(IdType type, String id, String json) async {
+    String idType = type.toString();
+    await _channel.invokeMethod('Pushe.sendAdvancedUserNotification', {
+      "type":idType,
+      "id":id,
+      "advancedJson":jsonEncode(json)
+    });
+    return;
+  }
 
   ///Send an event
   ///[name] is the name of event that wants to send
+  /// Possible option: SendEvent
   static Future<void> sendEvent(String name) async =>
-      _channel.invokeMethod("Pushe.sendEvent", {"name": name});
+      await _channel.invokeMethod("Pushe.sendEvent", {"name": name});
 
   /// Send ecommerce data.
   /// [name] is the name of ecommerce data
   /// [price] is the value of ecommerce name
   static Future<void> sendEcommerceData(String name, double price) async =>
-      _channel.invokeMethod(
+      await _channel.invokeMethod(
           "Pushe.sendEcommerceData", {"name": name, "price": price});
 
   /// Set callbacks for different types of events for notifications (in foreground or when app is open in the background)
@@ -155,13 +211,13 @@ class Pushe {
   /// [applicationOverridden] : If you have added [android:name="co.pushe.plus.flutter.PusheApplication"] to your AndroidManifest application attribute,
   /// the callbacks will be callable since user starts the app. But if not, callbacks will be available when you call [setNotificationListener] and before that callbacks won't work.
   /// This doesn't make so much difference. But in future case when Flutter added background fcm support, this can make difference.
-  static setNotificationListener(
+  static Future<void> setNotificationListener(
       {Function(NotificationData) onReceived,
       Function(NotificationData) onClicked,
       Function(NotificationData) onDismissed,
       Function(NotificationData, NotificationButtonData) onButtonClicked,
       Function(dynamic) onCustomContentReceived,
-      bool applicationOverridden: false}) {
+      bool applicationOverridden: false}) async {
     _receiveCallback = onReceived;
     _clickCallback = onClicked;
     _dismissCallback = onDismissed;
@@ -171,15 +227,13 @@ class Pushe {
     if (!applicationOverridden) {
       _channel.invokeMethod("Pushe.initNotificationListenerManually");
     }
+    return;
   }
 
   ///
   /// If a method was called from native code through channel this will handle it.
   ///
   static Future<Null> _handleMethod(MethodCall call) async {
-    print('Call: ${call.method}');
-    print('Call arg: ${call.arguments}');
-
     dynamic arg = jsonDecode(call.arguments);
 
     if (call.method == 'Pushe.onNotificationReceived') {
@@ -188,7 +242,7 @@ class Pushe {
       _clickCallback?.call(NotificationData.fromJson(arg['data']));
     } else if (call.method == 'Pushe.onNotificationButtonClicked') {
       try {
-        _buttonClickCallback?.call(NotificationData.fromJson(arg['data']), NotificationButtonData.fromJsonString(arg['button']));
+        _buttonClickCallback?.call(NotificationData.fromJson(arg['notification']['data']), NotificationButtonData.fromMap(arg['button']));
       } catch (e) {
         print('Pushe: Error passing notification data to callback ${e.toString()}');
       }
@@ -238,7 +292,7 @@ class NotificationData {
     try {
       List<NotificationButtonData> notificationButtons;
       try {
-        notificationButtons = NotificationButtonData.fromDynamic(data['buttons']);
+        notificationButtons = NotificationButtonData.fromList(data['buttons']);
       } catch (e) {
         notificationButtons = null;
       }
@@ -286,22 +340,20 @@ class NotificationData {
 /// For every button there would be an object in the callback notification data object.
 /// And also when a button is clicked, it's id and text will be passes separately in `onNotificationButtonClicked` callback.
 class NotificationButtonData {
-  String _text;
-  int _id;
+  String _title;
+  String _icon;
 
   NotificationButtonData._();
 
-  NotificationButtonData.create(this._text, this._id);
+  NotificationButtonData.create(this._title, this._icon);
 
-  int get id => _id;
-
-  String get text => _text;
+  String get title => _title;
+  String get icon => _icon;
 
   @override
-  String toString() => 'NotificationButtonData{_text: $_text, _id: $_id}';
+  String toString() => 'NotificationButtonData{_title: $_title, _icon: $_icon}';
 
-  static NotificationButtonData fromMap(dynamic d) {
-    var data = jsonDecode(d);
+  static NotificationButtonData fromMap(dynamic data) {
     try {
       return NotificationButtonData.create(data['title'], data['icon']);
     } catch (e) {
@@ -310,28 +362,12 @@ class NotificationButtonData {
     }
   }
 
-  static NotificationButtonData fromJsonString(dynamic json) {
-    return fromMap(json);
-  }
-
-  static List<NotificationButtonData> fromDynamic(dynamic buttons) {
-    return buttons.map((item) {
-      print('Button: $item');
-      return NotificationButtonData.create(item['title'], item['icon']);
-    });
-  }
-
-  static List<NotificationButtonData> fromJsonList(dynamic json) {
-    try {
-      var result = (json as List<dynamic>).map((item) {
-        print('Button: $item');
-        return fromMap(item);
-      });
-      return result.toList();
-    } catch (e) {
-      print(
-          'Error getting button list from notification\nError:$e\nJson:$json');
-      return null;
+  static List<NotificationButtonData> fromList(dynamic buttons) {
+    List<dynamic> list = buttons;
+    List<NotificationButtonData> buttonDataList = new List();
+    for(var i in list) {
+      buttonDataList.add(NotificationButtonData.create(i['title'], i['icon']));
     }
+    return buttonDataList;
   }
 }

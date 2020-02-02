@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pushe_flutter/pushe.dart';
 
-
 class PusheSampleWidget extends StatefulWidget {
   createState() => _PusheSampleState();
 }
@@ -18,146 +17,25 @@ class _PusheSampleState extends State<PusheSampleWidget> {
     super.initState();
   }
 
-
   void _updateStatus(String text) async {
-    var result = "";
-
-    switch (actions.indexOf(text)) {
-      case 0:
-        result = 'Pushe id: ${await Pushe.getAndroidId()}';
-        break;
-      case 1:
-        result = "Is Pushe initialized: " +
-            (await Pushe.isInitialized()).toString();
-        break;
-      case 2:
-        result = "Is Pushe registered: " +
-            (await Pushe.isRegistered()).toString();
-        break;
-      case 3:
-        result = "Subscribe to topic: sport";
-        Pushe.subscribe('sport',callback:(output) {
-          if (output) setState(() {
-            statusText =
-            '$statusText \n --------------- \n Successfully subscribed to topic sport \n ${DateTime
-                .now()}';
-          });
-        });
-
-        break;
-      case 4:
-        result = "Unsubscribe from topic: sport";
-        Pushe.unsubscribe('sport',callback:(output) {
-          if (output) setState(() {
-            statusText =
-            '$statusText \n --------------- \n Successfully unsubscribed from topic sport \n ${DateTime
-                .now()}';
-          });
-        });
-
-
-        break;
-      case 5:
-        result = 'Sending simple notification with title:"title1",content:"content1"';
-        Pushe.sendNotificationToUser(
-            await Pushe.getAndroidId(), 'title1', 'content1');
-        break;
-      case 6:
-        result = 'Sending event with name:"name1"';
-        Pushe.sendEvent('name 1');
-        break;
-      case 7:
-        result = 'Sending ecomment with name:"product1",price:"100"';
-        Pushe.sendEcommerceData('product1',100);
-        break;
-
-      case 8:
-        result = 'Add user type tag to premium';
-        Pushe.addTags({'type':'premium'},callback:(output) {
-          if (output) setState(() {
-            statusText =
-            '$statusText \n --------------- \n Successfully user type tag set to premium \n ${DateTime
-                .now()}';
-          });
-        });
-        break;
-
-      case 9:
-        result = 'Remove user type tag from user';
-        Pushe.removeTags(['type'],callback:(output) {
-          if (output) setState(() {
-            statusText =
-            '$statusText \n --------------- \n Successfully user type tag removed \n ${DateTime
-                .now()}';
-          });
-        });
-        break;
-
-      case 10:
-        result = 'Subscribed tags are as follow';
-
-        var tags = await Pushe.getSubscribedTags();
-        tags.forEach((k,v) => result = '$result \n --------------- \n key = $k and value = $v');
-
-        break;
-
-      case 11:
-        result = 'Subscribed topics are as follow';
-
-        var topics = await Pushe.getSubscribedTopics();
-        topics.forEach((v) => result = '$result \n --------------- \n topic name is = $v');
-        break;
-
-      case 12:
-        result = 'Google advertising id : ${await Pushe.getGoogleAdvertisingId()}';
-        break;
-
-      case 13:
-        result = 'Custom id : ${await Pushe.getCustomId()}';
-        break;
-
-      case 14:
-        result = 'Set custom id to id123 ';
-        Pushe.setCustomId('id123');
-
-        break;
-
-      case 15:
-        result = 'Email is : ${await Pushe.getUserEmail()}';
-        break;
-
-      case 16:
-        result = 'Set Email to support@pushe.co';
-        Pushe.setUserEmail('support@pushe.co');
-
-        break;
-
-      case 17:
-        result = 'user phone number is : ${await Pushe.getUserPhoneNumber()}';
-        break;
-
-      case 18:
-        result = 'Set user phone number to 09121234567';
-        Pushe.setUserPhoneNumber('09121234567');
-        break;
-
-      default:
-        result = text;
-        break;
-    }
-
     setState(() {
-      statusText = '$statusText \n --------------- \n $result \n ${DateTime.now()}';
+      statusText =
+          '$statusText \n --------------- \n $text \n ${DateTime.now()}';
     });
   }
 
   void _implementListeners() {
     Pushe.setNotificationListener(
-      onReceived: (notificationData) => _updateStatus('Notification received: $notificationData'),
-      onClicked: (notificationData) => _updateStatus('Notification clicked: $notificationData'),
-      onDismissed: (notificationData) => _updateStatus('Notification dismissed: $notificationData'),
-      onButtonClicked: (notificationData, clickedButton) => _updateStatus('Notification button clicked: $notificationData, $clickedButton'),
-      onCustomContentReceived: (customContent) => _updateStatus('Notification custom content received: $customContent'),
+      onReceived: (notificationData) =>
+          _updateStatus('Notification received: $notificationData'),
+      onClicked: (notificationData) =>
+          _updateStatus('Notification clicked: $notificationData'),
+      onDismissed: (notificationData) =>
+          _updateStatus('Notification dismissed: $notificationData'),
+      onButtonClicked: (notificationData, clickedButton) => _updateStatus(
+          'Notification button clicked: $notificationData, $clickedButton'),
+      onCustomContentReceived: (customContent) =>
+          _updateStatus('Notification custom content received: $customContent'),
     );
   }
 
@@ -172,29 +50,6 @@ class _PusheSampleState extends State<PusheSampleWidget> {
     });
   }
 
-  List<String> actions = [
-    "Get Pushe ID",
-    "Check initialization",
-    "Check registeration",
-    "Subscribe to topic",
-    "Unsubscribe from topic",
-    "Send notification",
-    "Send Event",
-    "Send Ecommerce Data",
-    "Add user type tag and set it's value to premium",
-     "Remove user type tag",
-    "Get subscribed tags",
-    "Get subscribed topics",
-    "Get google advertising id",
-    "Get custom id",
-    "Set custom id to id123",
-    "Get user email",
-    "Set user email to support@pushe.co",
-    "Get user phone",
-    "Set user phone number to 09121234567"
-
-      ];
-
   // All managing functions
 
   @override
@@ -206,7 +61,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
           bottom: PreferredSize(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(0, 0, 0, 2),
-                child: Text('Flutter plugin: 2.0.2 | native version: 2.0.4',
+                child: Text('Flutter plugin: 2.0.3 | native version: 2.0.4',
                     style: TextStyle(color: Colors.white)),
               ),
               preferredSize: null),
@@ -216,7 +71,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
           children: <Widget>[
             Flexible(
               child: SingleChildScrollView(
-                child: _getList(actions, (status) => _updateStatus(status)),
+                child: _getList(_getActions()),
               ),
               flex: 8,
             ),
@@ -232,14 +87,13 @@ class _PusheSampleState extends State<PusheSampleWidget> {
                 controller: _scrollController,
                 reverse: true,
                 child: Container(
-                    decoration:
-                        BoxDecoration(color:Colors.white),
+                    decoration: BoxDecoration(color: Colors.white),
                     child: Padding(
                         padding: EdgeInsets.all(4.0),
                         child: GestureDetector(
                             onDoubleTap: _clearStatus,
                             child: Text(statusText,
-                                style: TextStyle(color: Colors.blue))))),
+                                style: TextStyle(color: Colors.black))))),
               ),
               flex: 6,
             )
@@ -247,10 +101,10 @@ class _PusheSampleState extends State<PusheSampleWidget> {
         ));
   }
 
-  Widget _getList(List<String> items, void Function(String) tap) {
+  Widget _getList(Map<String, Function> values) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: items.map((itemText) {
+      children: values.keys.map((itemText) {
         return Padding(
           padding: EdgeInsets.all(4.0),
           child: Container(
@@ -259,7 +113,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
                 borderRadius: BorderRadius.all(Radius.circular(4.0)),
               ),
               child: InkWell(
-                onTap: () => tap(itemText),
+                onTap: () => values[itemText](), // call it's action
                 child: Card(
                     elevation: 2,
                     margin: EdgeInsets.all(2.0),
@@ -267,14 +121,267 @@ class _PusheSampleState extends State<PusheSampleWidget> {
                         child: Text(itemText,
                             style: TextStyle(
                                 color: Theme.of(context).primaryColor,
-                                fontSize: 15.0)
-                        )
-                    )
-                ),
-              )
-          ),
+                                fontSize: 15.0)))),
+              )),
         );
       }).toList(),
     );
+  }
+
+  Future<void> alert(Function onOK,
+      {String title: 'Pushe', String message: 'Do you accept?'}) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(message),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                onOK();
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('Nope'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> getInfo(Function(String) onOK,
+      {String title: 'Pushe',
+      String message: 'Do you accept?',
+      String ok: 'OK',
+      String no: 'Nope',
+      Function(String) onNo}) async {
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        var result = "";
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(message),
+                TextFormField(
+                  decoration: InputDecoration(hintText: title),
+                  onChanged: (text) {
+                    result = text;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text(ok),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await onOK(result);
+              },
+            ),
+            FlatButton(
+              child: Text(no),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await onNo?.call(result);
+              },
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  ///
+  /// All possible actions which come into the list
+  Map<String, Function> _getActions() {
+    return {
+      "IDs": () async {
+        alert(() {}, title: 'IDs', message: """
+      AndroidId:
+      ${await Pushe.getAndroidId()},
+      GoogleAdId:
+      ${await Pushe.getGoogleAdvertisingId()},
+      """);
+      },
+      "Custom ID": () async {
+        await getInfo((text) {
+          Pushe.setCustomId(text);
+          _updateStatus('CustomId is $text');
+        },
+            title: 'New customId',
+            message: 'Current customId: ${await Pushe.getCustomId()}');
+      },
+      "PhoneNumber": () async {
+        await getInfo((text) {
+          Pushe.setUserPhoneNumber(text);
+          _updateStatus('PhoneNumber is $text');
+        },
+            title: 'New PhoneNumber',
+            message:
+                'Current PhoneNumber: ${await Pushe.getUserPhoneNumber()}');
+      },
+      "Email": () async {
+        await getInfo((text) {
+          Pushe.setUserEmail(text);
+          _updateStatus('Email is $text');
+        },
+            title: 'New Email',
+            message: 'Current Email: ${await Pushe.getUserEmail()}');
+      },
+      "Module intiatization status": () async {
+        _updateStatus('Modules initialzed: ${await Pushe.isInitialized()}');
+      },
+      "Module Registration status": () async {
+        _updateStatus('Device Registered: ${await Pushe.isRegistered()}');
+      },
+      "Topic": () async {
+        await getInfo(
+            (text) {
+              Pushe.subscribe(text, callback: () {
+                _updateStatus('Subscribed to $text');
+              });
+            },
+            title: 'Topic',
+            message: """
+        Topics: ${(await Pushe.getSubscribedTopics()).toString()}
+        Enter topic name to subscribe or unsubscribe:
+        """,
+            ok: 'Subscribe',
+            no: 'Unsubscribe',
+            onNo: (text) {
+              Pushe.unsubscribe(text, callback: () {
+                _updateStatus('Unsubscribed from $text');
+              });
+            });
+      },
+      "Tag (name:value)": () async {
+        await getInfo(
+            (text) {
+              var parts = text.split(":");
+              if (parts.length != 2) return;
+              Pushe.addTags({parts[0]: parts[1]}, callback: () {
+                _updateStatus('Tag ${parts[0]} added');
+              });
+            },
+            title: 'Topic',
+            message: """
+        Tags:
+        ${(await Pushe.getSubscribedTags()).toString()}
+        Tag in name:value format (add)
+        Tag in name1,name2 format (remove)
+        """,
+            ok: 'Add',
+            no: 'Remove',
+            onNo: (text) {
+              var parts = text.split(",");
+              if (parts == null || parts.isEmpty) return;
+              Pushe.removeTags(parts, callback: () {
+                _updateStatus('Tags $parts removed');
+              });
+            });
+      },
+      "Analytics: Event": () async {
+        await getInfo((text) {
+          Pushe.sendEvent(text);
+          _updateStatus('Sending event: $text');
+        }, title: 'Event', message: 'Type event name to send');
+      },
+      "Analytics: Ecommerce": () async {
+        await getInfo((text) {
+          var parts = text.split(":");
+          if (parts.length != 2) return;
+          try {
+            Pushe.sendEcommerceData(parts[0], double.parse(parts[1]));
+            _updateStatus(
+                'Sending Ecommerce data with name ${parts[0]} and price ${parts[1]}');
+          } catch (e) {
+            _updateStatus('Enter valid price (price is double)');
+          }
+        },
+            title: 'Ecommerce',
+            message: 'Enter value in name:price format to send data');
+      },
+      "Notification: AndroidId": () async {
+        await getInfo(
+            (text) async {
+              Pushe.sendNotificationToUser(IdType.AndroidId,
+                  await Pushe.getAndroidId(), 'Title for me', 'Content for me');
+              _updateStatus('Sending notification to this device');
+            },
+            title: 'Notification',
+            message:
+                'Enter androidId to send a simple notification to the user',
+            ok: 'Send to me',
+            no: 'Send to ...',
+            onNo: (text) {
+              Pushe.sendNotificationToUser(
+                  IdType.AndroidId, text, 'Test title', 'Test content');
+              _updateStatus('Sending notification to AndroidId: $text');
+            });
+      },
+      "Notification: GoogleAdId": () async {
+        await getInfo(
+            (text) async {
+              Pushe.sendNotificationToUser(
+                  IdType.GoogleAdvertisingId,
+                  await Pushe.getGoogleAdvertisingId(),
+                  'Title for me',
+                  'Content for me');
+              _updateStatus('Sending notification to this device');
+            },
+            title: 'Notification',
+            message:
+                'Enter GoogleAdID to send a simple notification to the user',
+            ok: 'Send to me',
+            no: 'Send to ...',
+            onNo: (text) {
+              Pushe.sendNotificationToUser(IdType.GoogleAdvertisingId, text,
+                  'Test title', 'Test content');
+              _updateStatus('Sending notification to GoogleAdID: $text');
+            });
+      },
+      "Notification: CustomId": () async {
+        await getInfo(
+            (text) {
+              Pushe.getCustomId().then((value) {
+                if (value == null || value.isEmpty) {
+                  _updateStatus("Can not send by CustomID when there's none");
+                  return;
+                }
+                Pushe.sendNotificationToUser(
+                    IdType.CustomId, value, 'Title for me', 'Content for me');
+                _updateStatus('Sending notification to this device');
+              });
+            },
+            title: 'Notification',
+            message: 'Enter CustomId to send a simple notification to the user',
+            ok: 'Send to me',
+            no: 'Send to ...',
+            onNo: (text) {
+              Pushe.sendNotificationToUser(
+                  IdType.CustomId, text, 'Test title', 'Test content');
+              _updateStatus('Sending notification to CustomId: $text');
+            });
+      }
+    };
   }
 }

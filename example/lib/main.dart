@@ -10,7 +10,7 @@ class PusheSampleApp extends StatelessWidget {
     return MaterialApp(
       title: 'Pushe sample',
       theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
+        primarySwatch: Colors.cyan,
       ),
       home: PusheSampleWidget()
     );
