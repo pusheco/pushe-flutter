@@ -8,9 +8,9 @@ class PusheSampleApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Pushe sample',
+      title: 'Pushe Flutter',
       theme: ThemeData(
-        primarySwatch: Colors.cyan,
+        primarySwatch: Colors.blue,
       ),
       home: PusheSampleWidget()
     );
