@@ -1,7 +1,11 @@
+# Flutter stuff
+
 .DS_Store
 .dart_tool/
 .idea/*
 .packages
 .pub/
-
 build/
+
+# Pushe
+/.tasks.md

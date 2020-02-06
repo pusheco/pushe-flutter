@@ -3,7 +3,7 @@ import UIKit
 
 public class SwiftPushePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "pushe", binaryMessenger: registrar.messenger())
+    let channel = FlutterMethodChannel(name: "plus.pushe.co/pushe_flutter", binaryMessenger: registrar.messenger())
     let instance = SwiftPushePlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
   }

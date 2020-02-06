@@ -56,12 +56,12 @@ class _PusheSampleState extends State<PusheSampleWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Pushe sample'),
+          title: Text('Pushe flutter'),
           centerTitle: true,
           bottom: PreferredSize(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(0, 0, 0, 2),
-                child: Text('Flutter plugin: 2.0.3 | native version: 2.0.4',
+                child: Text('Flutter plugin: 2.1.0 experimental',
                     style: TextStyle(color: Colors.white)),
               ),
               preferredSize: null),

@@ -1,5 +1,6 @@
 package co.pushe.plus.flutter;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -22,6 +23,9 @@ import co.pushe.plus.notification.PusheNotificationListener;
 import io.flutter.app.FlutterApplication;
 import io.flutter.view.FlutterMain;
 
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE;
+
 public class PusheApplication extends FlutterApplication {
 
     @Override
@@ -40,38 +44,58 @@ public class PusheApplication extends FlutterApplication {
         pusheNotification.setNotificationListener(new PusheNotificationListener() {
             @Override
             public void onNotification(NotificationData notificationData) {
-                sendBroadcastOnMainThread(c,
-                c.getPackageName() + ".nr",
-                Pair.create("data", notificationDataJson(notificationData).toString()));
+                if (foregrounded()) {
+                    sendBroadcastOnMainThread(c,
+                            c.getPackageName() + ".nr",
+                            Pair.create("data", notificationDataJson(notificationData).toString()));
+                } else {
+                    Log.e("Pushe", "onNotification: App is not on foreground");
+                }
             }
 
             @Override
             public void onCustomContentNotification(Map<String, Object> customContent) {
-                sendBroadcastOnMainThread(c,
-                c.getPackageName() + ".nccr",
-                Pair.create("json", new JSONObject(customContent).toString()));
+                if (foregrounded()) {
+                    sendBroadcastOnMainThread(c,
+                            c.getPackageName() + ".nccr",
+                            Pair.create("json", new JSONObject(customContent).toString()));
+                } else {
+                    Log.e("Pushe", "onCustomContentNotification: App is not on foreground");
+                }
             }
 
             @Override
             public void onNotificationClick(NotificationData notificationData) {
-                sendBroadcastOnMainThread(c,
-                        c.getPackageName() + ".nc",
-                        Pair.create("data", notificationDataJson(notificationData).toString()));
+                if (foregrounded()) {
+                    sendBroadcastOnMainThread(c,
+                            c.getPackageName() + ".nc",
+                            Pair.create("data", notificationDataJson(notificationData).toString()));
+                } else {
+                    Log.e("Pushe", "onNotificationClick: App is not on foreground");
+                }
             }
 
             @Override
             public void onNotificationDismiss(NotificationData notificationData) {
-                sendBroadcastOnMainThread(c,
-                c.getPackageName() + ".nd",
-                        Pair.create("data", notificationDataJson(notificationData).toString()));
+                if (foregrounded()) {
+                    sendBroadcastOnMainThread(c,
+                            c.getPackageName() + ".nd",
+                            Pair.create("data", notificationDataJson(notificationData).toString()));
+                } else {
+                    Log.e("Pushe", "onNotificationDismiss: App is not on foreground");
+                }
             }
 
             @Override
             public void onNotificationButtonClick(NotificationButtonData notificationButtonData, NotificationData notificationData) {
-                sendBroadcastOnMainThread(c,
-                c.getPackageName() + ".nbc",
-                        Pair.create("data", notificationDataJson(notificationData).toString()),
-                    Pair.create("button", notificationButtonDataJson(notificationButtonData).toString()));
+                if (foregrounded()) {
+                    sendBroadcastOnMainThread(c,
+                            c.getPackageName() + ".nbc",
+                            Pair.create("data", notificationDataJson(notificationData).toString()),
+                            Pair.create("button", notificationButtonDataJson(notificationButtonData).toString()));
+                } else {
+                    Log.e("Pushe", "onNotificationButtonClick: App is not on foreground");
+                }
             }
         });
     }
@@ -108,16 +132,16 @@ public class PusheApplication extends FlutterApplication {
             try {
                 o.put("json", new JSONObject(data.getCustomContent()));
             } catch (Exception e) {
-                Log.d("Pushe", "Failed to add customContent to notification content", e);
+                Log.d("Pushe", "Failed to add customContent to notification content.");
             }
             try {
                 o.put("buttons", notificationButtonDataList(data.getButtons()));
             } catch (Exception e) {
-                Log.w("Pushe", "Failed to parse notification buttons");
+                Log.d("Pushe", "Failed to parse notification buttons");
             }
             return o;
         } catch (JSONException e) {
-            Log.w("Pushe", "Failed to parse notification and convert it to Json.", e);
+            Log.w("Pushe", "Failed to parse notification and convert it to Json.");
             return null;
         }
     }
@@ -132,7 +156,7 @@ public class PusheApplication extends FlutterApplication {
             o.put("icon", buttonData.getIcon());
             return o;
         } catch (JSONException e) {
-            Log.w("Pushe", "Failed to parse notification and convert it to Json.", e);
+            Log.w("Pushe", "Failed to parse notification and convert it to Json.");
             return null;
         }
     }
@@ -143,6 +167,12 @@ public class PusheApplication extends FlutterApplication {
             jA.put(notificationButtonDataJson(i));
         }
         return jA;
+    }
+
+    public static boolean foregrounded() {
+        ActivityManager.RunningAppProcessInfo appProcessInfo = new ActivityManager.RunningAppProcessInfo();
+        ActivityManager.getMyMemoryState(appProcessInfo);
+        return (appProcessInfo.importance == IMPORTANCE_FOREGROUND || appProcessInfo.importance == IMPORTANCE_VISIBLE);
     }
 
 }
