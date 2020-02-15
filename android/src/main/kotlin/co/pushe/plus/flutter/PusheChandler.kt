@@ -472,7 +472,7 @@ internal class PusheChandler(private val context: Context,
                 channel.invokeMethod("Pushe.onNotificationClicked", getNotificationJsonFromIntent(intent).toString())
             }
             context.packageName + ".nbc" -> {
-                channel.invokeMethod("Pushe.onNotificationButtonClicked", getNotificationAndButtonFromIntent(intent).toString())
+                channel.invokeMethod("Pushe.onNotificationButtonClicked", getNotificationJsonFromIntent(intent).toString())
             }
             context.packageName + ".nccr" -> {
                 channel.invokeMethod("Pushe.onCustomContentReceived", getCustomContentFromIntent(intent).toString())
