@@ -11,19 +11,24 @@ import 'package:slide_popup_dialog/slide_popup_dialog.dart' as slideDialog;
 pusheBackgroundMessageHandler(String eventType, dynamic message) {
   switch(eventType) {
     case Pushe.notificationReceived:
-      print('Notification received in background ${message['data']}');
+      var notificationData = NotificationData.fromDynamic(message);
+      print('Notification received in background $notificationData');
       break;
     case Pushe.notifiactionClicked:
-      print('Notification clicked in background ${message['data']}');
+      var notificationData = NotificationData.fromDynamic(message);
+      print('Notification clicked in background $notificationData');
       break;
     case Pushe.notificationDismissed:
-      print('Notification dismissed in background ${message['data']}');
+      var notificationData = NotificationData.fromDynamic(message);
+      print('Notification dismissed in background $notificationData');
       break;
     case Pushe.notificationButtonClicked:
-      print('Notification button clicked in background ${message['data']} and clicked:  ${message['button']}');
+      var notificationData = NotificationData.fromDynamic(message);
+      print('Notification button clicked in background $notificationData & clicked button is ${notificationData.clickedButton}');
       break;
     case Pushe.customContentReceived:
-      print('Custom content received in background ${message['json']}');
+      // Message is a map and can not be parsed
+      print('Custom content received in background $message');
       break;
   }
 }
@@ -59,8 +64,8 @@ class _PusheSampleState extends State<PusheSampleWidget> {
           _updateStatus('Notification clicked: $notificationData'),
       onDismissed: (notificationData) =>
           _updateStatus('Notification dismissed: $notificationData'),
-      onButtonClicked: (notificationData, clickedButton) => _updateStatus(
-          'Notification button clicked: $notificationData, $clickedButton'),
+      onButtonClicked: (notificationData) => _updateStatus(
+          'Notification button clicked: $notificationData, ${notificationData.clickedButton}'),
       onCustomContentReceived: (customContent) =>
           _updateStatus('Notification custom content received: $customContent'),
       onBackgroundNotificationReceived: pusheBackgroundMessageHandler

@@ -15,7 +15,7 @@ import org.json.JSONObject
 internal object Pack {
 
     @JvmStatic
-    fun getNotificationJsonObject(data: NotificationData?): JSONObject? {
+    fun getNotificationJsonObject(data: NotificationData?, clickedButtonData: NotificationButtonData? = null): JSONObject? {
         if (data == null) {
             return null
         }
@@ -29,16 +29,24 @@ internal object Pack {
                 put("imageUrl", data.imageUrl)
                 put("summary", data.summary)
                 put("iconUrl", data.iconUrl)
-            }
-            try {
-                notificationObject.put("json", JSONObject(data.customContent))
-            } catch (e: Exception) {
-                lg("No json to put as customContent field")
-            }
-            try {
-                notificationObject.put("buttons", getButtonsJsonArray(data.buttons))
-            } catch (e: Exception) {
-                lg("No buttons to put as customContent field")
+
+                if (clickedButtonData != null) {
+                    try {
+                        put("clickedButton", getButtonJsonObject(clickedButtonData))
+                    } catch (e: Exception) {
+                        lg("[Parsing notification] Failed to add button to the notification data")
+                    }
+                }
+                try {
+                    put("json", JSONObject(data.customContent))
+                } catch (e: Exception) {
+                    lg("[Parsing notification] No json to put as customContent field")
+                }
+                try {
+                    put("buttons", getButtonsJsonArray(data.buttons))
+                } catch (e: Exception) {
+                    lg("[Parsing notification] No buttons to put as customContent field")
+                }
             }
             notificationObject
         } catch (e: JSONException) {
@@ -76,20 +84,15 @@ internal object Pack {
     ///// Background extensions
 
     @JvmStatic
-    fun getBackgroundNotificationObject(data: NotificationData, type: String, buttonData: NotificationButtonData? = null): JSONObject? {
+    fun getBackgroundNotificationObject(data: NotificationData, type: String, clickedButtonData: NotificationButtonData? = null): JSONObject? {
         val finalObject = JSONObject()
-        val notificationObject = getNotificationJsonObject(data)
+        val notificationObject = getNotificationJsonObject(data, clickedButtonData)
         if (notificationObject == null) {
             lg("Failed to get notification object")
             return null
         }
 
         finalObject.put("data", notificationObject)
-
-        if (type == Constants.BUTTON_CLICK && buttonData != null) {
-            val clickedButton = getButtonJsonObject(buttonData)
-            finalObject.put("button", clickedButton)
-        }
 
         finalObject.put("type", type)
 
@@ -123,7 +126,7 @@ internal object Pack {
             val data = intent.getStringExtra("json")
             o.put("json", JSONObject(data))
         } catch (e: JSONException) {
-            lg("Failed to parse notification")
+            lg("[Parsing notification] Failed to parse notification")
         }
         return o
     }
@@ -135,7 +138,7 @@ internal object Pack {
             val button = intent.getStringExtra("button")
             o = JSONObject(button)
         } catch (e: JSONException) {
-            lg("Failed to parse notification button")
+            lg("[Parsing notification] Failed to parse notification button")
         }
         return o
     }

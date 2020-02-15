@@ -1,3 +1,15 @@
+## 2.1.0-rc.1
+
+- Added Support for Android Embedded V2
+- Migrate native language to Kotlin
+- Added APIs:
+    * `createNotificationChannel`
+    * `removeNotificationChannel`
+    * `enableCustomSound`
+    * `DisableCustomSound`
+- Improvements on analytics methods `sendEvent` and `sendEcommerceData`
+- Added support for background execution to get the callbacks event when the app is fulled killed 
+
 ## 2.0.3
 
 - Fix bug in notification listeners

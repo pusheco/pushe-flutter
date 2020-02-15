@@ -160,17 +160,12 @@ internal object PusheNotificationListener {
                 val type = Constants.BUTTON_CLICK
                 if (isAppOnForeground()) {
                     lg("Notification button is clicked in the foreground")
-                    val message = getNotificationJsonObject(notificationData)
-                    val button = getButtonJsonObject(notificationButtonData)
-                    if (message == null || button == null) {
+                    val message = getNotificationJsonObject(notificationData, notificationButtonData)
+                    if (message == null) {
                         Log.e(TAG, "onNotificationButtonClick: Failed to get message or clicked button of callback")
                         return
                     }
-                    handleForegroundMessage(c, c.packageName + ".nd", Pair.create<String, String>("data", message.toString()))
-                    handleForegroundMessage(c,
-                            c.packageName + ".nbc",
-                            Pair.create<String, String>("data", message.toString()),
-                            Pair.create<String, String>("button", button.toString()))
+                    handleForegroundMessage(c, c.packageName + ".nbc", Pair.create<String, String>("data", message.toString()))
                 } else {
                     lg("Notification button is clicked in the background")
                     val backgroundMessage = getBackgroundNotificationObject(notificationData, type, notificationButtonData)

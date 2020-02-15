@@ -12,7 +12,6 @@ import 'package:flutter/widgets.dart';
 enum IdType { AndroidId, GoogleAdvertisingId, CustomId }
 enum EventAction { custom, sign_up, login, purchase, achievement, level }
 
-
 void _pusheSetupBackgroundChannel(
     {MethodChannel backgroundChannel =
         const MethodChannel('plus.pushe.co/pushe_flutter_background')}) async {
@@ -33,10 +32,11 @@ void _pusheSetupBackgroundChannel(
           print('Data received from callback is null');
           return;
         }
-        Map data = jsonDecode(dataArg);
-        String eventType = data['type'];
-        data.remove('type');
-        await handlerFunction(eventType, data);
+        Map wholeData = jsonDecode(dataArg);
+        String eventType = wholeData['type'];
+        Map messageContent = eventType == "custom_content" ? wholeData['json'] :  wholeData['data'];
+
+        await handlerFunction(eventType, messageContent);
       } catch (e) {
         print('Unable to handle incoming background message.\n$e');
       }
@@ -60,12 +60,13 @@ class Pushe {
   static const String notificationDismissed = 'dismiss';
   static const String notificationButtonClicked = 'button_click';
   static const String customContentReceived = 'custom_content';
+
   // Callback handlers
   static void Function(NotificationData) _receiveCallback;
   static void Function(NotificationData) _clickCallback;
   static void Function(NotificationData) _dismissCallback;
   static void Function(dynamic) _customContentCallback;
-  static void Function(NotificationData, NotificationButtonData)
+  static void Function(NotificationData)
       _buttonClickCallback;
 
   static const MethodChannel _channel =
@@ -326,7 +327,7 @@ class Pushe {
     Function(NotificationData) onReceived,
     Function(NotificationData) onClicked,
     Function(NotificationData) onDismissed,
-    Function(NotificationData, NotificationButtonData) onButtonClicked,
+    Function(NotificationData) onButtonClicked,
     Function(dynamic) onCustomContentReceived,
     Function(String, dynamic) onBackgroundNotificationReceived,
   }) async {
@@ -372,16 +373,15 @@ class Pushe {
     dynamic arg = jsonDecode(call.arguments);
 
     if (call.method == 'Pushe.onNotificationReceived') {
-      _receiveCallback?.call(NotificationData.fromJson(arg['data']));
+      _receiveCallback?.call(NotificationData.fromDynamic(arg['data']));
     } else if (call.method == 'Pushe.onNotificationClicked') {
-      _clickCallback?.call(NotificationData.fromJson(arg['data']));
+      _clickCallback?.call(NotificationData.fromDynamic(arg['data']));
     } else if (call.method == 'Pushe.onNotificationButtonClicked') {
       try {
-        _buttonClickCallback?.call(
-            NotificationData.fromJson(arg['notification']['data']),
-            NotificationButtonData.fromMap(arg['button']));
+        _buttonClickCallback?.call(NotificationData.fromDynamic(arg['data']));
       } catch (e) {
-        print('Pushe: Error passing notification data to callback ${e.toString()}');
+        print(
+            'Pushe: Error passing notification data to callback ${e.toString()}');
       }
     } else if (call.method == 'Pushe.onCustomContentReceived') {
       try {
@@ -391,7 +391,7 @@ class Pushe {
         print('Pushe: Error passing customContent to callback');
       }
     } else if (call.method == 'Pushe.onNotificationDismissed') {
-      _dismissCallback?.call(NotificationData.fromJson(arg['data']));
+      _dismissCallback?.call(NotificationData.fromDynamic(arg['data']));
     }
     return null;
   }
@@ -411,6 +411,7 @@ class NotificationData {
       _iconUrl;
   dynamic _customContent;
   List<NotificationButtonData> _buttons;
+  NotificationButtonData _clickedButton;
 
   NotificationData._();
 
@@ -423,15 +424,22 @@ class NotificationData {
       this._imageUrl,
       this._iconUrl,
       this._customContent,
-      this._buttons);
+      this._buttons,
+      this._clickedButton);
 
-  static NotificationData fromJson(dynamic data) {
+  static NotificationData fromDynamic(dynamic data) {
     try {
       List<NotificationButtonData> notificationButtons;
       try {
         notificationButtons = NotificationButtonData.fromList(data['buttons']);
       } catch (e) {
         notificationButtons = null;
+      }
+      NotificationButtonData clickedButton;
+      try {
+        clickedButton = NotificationButtonData.fromMap(data['clickedButton']);
+      } catch(e) {
+        clickedButton = null;
       }
       return NotificationData.create(
           data['title'],
@@ -442,7 +450,8 @@ class NotificationData {
           data['imageUrl'],
           data['iconUrl'],
           data['json'],
-          notificationButtons);
+          notificationButtons,
+          clickedButton);
     } catch (e) {
       return null;
     }
@@ -450,7 +459,7 @@ class NotificationData {
 
   @override
   String toString() =>
-      'NotificationData{_title: $_title, _content: $_content, _bigTitle: $_bigTitle, _bigContent: $_bigContent, _summary: $_summary, _imageUrl: $_imageUrl, _iconUrl: $_iconUrl, _customContent: $_customContent, buttons: $_buttons}';
+      'NotificationData{_title: $_title, _content: $_content, _bigTitle: $_bigTitle, _bigContent: $_bigContent, _summary: $_summary, _imageUrl: $_imageUrl, _iconUrl: $_iconUrl, _customContent: $_customContent, buttons: $_buttons, clickedButton: $_clickedButton}';
 
   get customContent => _customContent;
 
@@ -469,6 +478,8 @@ class NotificationData {
   get title => _title;
 
   get buttons => _buttons;
+
+  get clickedButton => _clickedButton;
 }
 
 ///
