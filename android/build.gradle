@@ -1,5 +1,8 @@
 group 'co.pushe.plus.flutter'
 version '1.0-SNAPSHOT'
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 buildscript {
     repositories {
@@ -20,7 +23,7 @@ rootProject.allprojects {
     }
 }
 
-apply plugin: 'com.android.library'
+
 
 android {
     compileSdkVersion 28
@@ -31,8 +34,16 @@ android {
     lintOptions {
         disable 'InvalidPackage'
     }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
 }
 
 dependencies {
     implementation ("co.pushe.plus:base:2.0.4")
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }

@@ -9,6 +9,5 @@ public class EmbeddingV1Activity extends FlutterActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        PushePlugin.registerWith(registrarFor("co.pushe.plus.flutter.PushePlugin"));
     }
 }

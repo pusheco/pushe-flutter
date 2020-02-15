@@ -1,5 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:pushe_flutter/pushe.dart';
+import 'package:slide_popup_dialog/slide_popup_dialog.dart' as slideDialog;
+
+/// The function is a top level which runs in another isolate.
+/// This function must be top level or static, since it has to be independent of any class.
+/// [message] is a map which has either 'data', 'json' or 'button' depending on event type.
+///    if the type is 'receive', 'click' or 'dismiss', it will have data (which customContent is part of it).
+///    if the type is 'customContent' it will have only 'json'.
+///    if the type is 'buttonClick', it will contain 'data' and 'button'.
+pusheBackgroundMessageHandler(String eventType, dynamic message) {
+  switch(eventType) {
+    case Pushe.notificationReceived:
+      print('Notification received in background ${message['data']}');
+      break;
+    case Pushe.notifiactionClicked:
+      print('Notification clicked in background ${message['data']}');
+      break;
+    case Pushe.notificationDismissed:
+      print('Notification dismissed in background ${message['data']}');
+      break;
+    case Pushe.notificationButtonClicked:
+      print('Notification button clicked in background ${message['data']} and clicked:  ${message['button']}');
+      break;
+    case Pushe.customContentReceived:
+      print('Custom content received in background ${message['json']}');
+      break;
+  }
+}
 
 class PusheSampleWidget extends StatefulWidget {
   createState() => _PusheSampleState();
@@ -36,6 +63,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
           'Notification button clicked: $notificationData, $clickedButton'),
       onCustomContentReceived: (customContent) =>
           _updateStatus('Notification custom content received: $customContent'),
+      onBackgroundNotificationReceived: pusheBackgroundMessageHandler
     );
   }
 
@@ -129,7 +157,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
   }
 
   Future<void> alert(Function onOK,
-      {String title: 'Pushe', String message: 'Do you accept?'}) async {
+      {String title: 'Pushe', String message: 'Do you accept?', String ok: 'OK', String no: 'Cancel', Function onNo}) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -145,15 +173,16 @@ class _PusheSampleState extends State<PusheSampleWidget> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('OK'),
+              child: Text(ok),
               onPressed: () {
                 onOK();
                 Navigator.of(context).pop();
               },
             ),
             FlatButton(
-              child: Text('Nope'),
+              child: Text(no),
               onPressed: () {
+                onNo?.call();
                 Navigator.of(context).pop();
               },
             )
@@ -210,17 +239,20 @@ class _PusheSampleState extends State<PusheSampleWidget> {
     );
   }
 
+  void _showDialog(Widget child) {
+    slideDialog.showSlideDialog(
+      context: context,
+      child: child,
+    );
+  }
+
   ///
   /// All possible actions which come into the list
   Map<String, Function> _getActions() {
     return {
       "IDs": () async {
-        alert(() {}, title: 'IDs', message: """
-      AndroidId:
-      ${await Pushe.getAndroidId()},
-      GoogleAdId:
-      ${await Pushe.getGoogleAdvertisingId()},
-      """);
+        alert(() {}, title: 'IDs',
+        message: "AndroidId:\n${await Pushe.getAndroidId()}\n\nGoogleAdId:\n${await Pushe.getGoogleAdvertisingId()}");
       },
       "Custom ID": () async {
         await getInfo((text) {
@@ -262,8 +294,8 @@ class _PusheSampleState extends State<PusheSampleWidget> {
             },
             title: 'Topic',
             message: """
-        Topics: ${(await Pushe.getSubscribedTopics()).toString()}
-        Enter topic name to subscribe or unsubscribe:
+Topics: ${(await Pushe.getSubscribedTopics()).toString()}\n
+Enter topic name to subscribe or unsubscribe:
         """,
             ok: 'Subscribe',
             no: 'Unsubscribe',
@@ -272,6 +304,32 @@ class _PusheSampleState extends State<PusheSampleWidget> {
                 _updateStatus('Unsubscribed from $text');
               });
             });
+      },
+      "Notification channel": () async {
+        await getInfo(
+            (text) {
+              // Create (only name and Id)
+              var parts = text.split(":");
+              if (parts.length != 2) {
+                _updateStatus("Enter id and name in id:name format");
+                return;
+              }
+
+              var id = parts[0];
+              var name = parts[1];
+              Pushe.createNotificationChannel(id, name);
+              _updateStatus("Create notification channel $name");
+            },
+          title: "Channel",
+          message: 'Enter channel id and name in id:name format and tap create to create a channel\nOr enter channel id and tap remove to remove a channel',
+          ok: 'Create',
+          no: "Remove",
+          onNo: (text) {
+              var id = text;
+              Pushe.removeNotificationChannel(id);
+              _updateStatus('Remove notification channel with id $id');
+          }
+        );
       },
       "Tag (name:value)": () async {
         await getInfo(
@@ -282,7 +340,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
                 _updateStatus('Tag ${parts[0]} added');
               });
             },
-            title: 'Topic',
+            title: 'Tag',
             message: """
         Tags:
         ${(await Pushe.getSubscribedTags()).toString()}
@@ -381,7 +439,31 @@ class _PusheSampleState extends State<PusheSampleWidget> {
                   IdType.CustomId, text, 'Test title', 'Test content');
               _updateStatus('Sending notification to CustomId: $text');
             });
-      }
+      },
+      "Enable/Disable notification": () async {
+        await alert(() {
+          Pushe.setNotificationOn();
+          _updateStatus("Notifications will be shown");
+        }, title: 'Notification', message: 'Current status: ${await Pushe.isNotificationOn() ? "Enabled" : "Disabled" }\nDo you want to enable or disable notification publishing?',
+        ok: 'Enable', no: 'Disable',
+        onNo: () {
+          Pushe.setNotificationOff();
+          _updateStatus("Notifications won't be shown if received");
+        }
+        );
+      },
+      "Enable/Disable custom sound": () async {
+        await alert(() {
+          Pushe.enableCustomSound();
+          _updateStatus('Custom sound will be played if received');
+        }, title: 'Custom sound', message: 'Current status: ${await Pushe.isCustomSoundEnabled() ? "Enabled" : "Disabled"  }\nDo you want to enable or disable custom sound for notification?',
+        ok: 'Enable', no: 'Disable',
+        onNo: () {
+          Pushe.disableCustomSound();
+          _updateStatus("Custom sound won't be played if received");
+        }
+        );
+      },
     };
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  const MethodChannel channel = MethodChannel('pushe');
+  const MethodChannel channel = MethodChannel('plus.pushe.co/pushe_flutter');
 
   setUp(() {
     channel.setMockMethodCallHandler((MethodCall methodCall) async {
@@ -14,7 +14,7 @@ void main() {
     channel.setMockMethodCallHandler(null);
   });
 
-  test('getPlatformVersion', () async {
+  test('dummyTest', () async {
 //    expect(await Pushe.platformVersion, '42');
   });
 }
