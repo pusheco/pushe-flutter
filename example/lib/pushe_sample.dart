@@ -68,6 +68,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
           'Notification button clicked: $notificationData, ${notificationData.clickedButton}'),
       onCustomContentReceived: (customContent) =>
           _updateStatus('Notification custom content received: $customContent'),
+      // This function only works in background
       onBackgroundNotificationReceived: pusheBackgroundMessageHandler
     );
   }
@@ -241,13 +242,6 @@ class _PusheSampleState extends State<PusheSampleWidget> {
           ],
         );
       },
-    );
-  }
-
-  void _showDialog(Widget child) {
-    slideDialog.showSlideDialog(
-      context: context,
-      child: child,
     );
   }
 

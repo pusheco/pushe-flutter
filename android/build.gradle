@@ -42,6 +42,7 @@ android {
 
 dependencies {
     implementation ("co.pushe.plus:base:2.0.4")
+    api "androidx.multidex:multidex:2.0.1"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 repositories {

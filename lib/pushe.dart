@@ -12,9 +12,8 @@ import 'package:flutter/widgets.dart';
 enum IdType { AndroidId, GoogleAdvertisingId, CustomId }
 enum EventAction { custom, sign_up, login, purchase, achievement, level }
 
-void _pusheSetupBackgroundChannel(
-    {MethodChannel backgroundChannel =
-        const MethodChannel('plus.pushe.co/pushe_flutter_background')}) async {
+void _pusheSetupBackgroundChannel() async {
+  MethodChannel backgroundChannel = const MethodChannel('plus.pushe.co/pushe_flutter_background');
   // Setup Flutter state needed for MethodChannels.
   WidgetsFlutterBinding.ensureInitialized();
 
