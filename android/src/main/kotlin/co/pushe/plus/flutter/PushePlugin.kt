@@ -114,5 +114,10 @@ class PushePlugin : FlutterPlugin, ActivityAware {
          */
         @JvmStatic
         var debugMode = false
+
+        @JvmStatic
+        fun appOnForeground(foreground: Boolean) {
+            PusheLifeCycle.isForeground = foreground
+        }
     }
 }
