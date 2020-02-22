@@ -226,7 +226,7 @@ internal object PusheNotificationListener {
             lg("Isolate is not running, adding message to queue")
             backgroundMessageQueue.add(backgroundMessage)
         } else {
-            lg("Isolate is running, executing message $backgroundMessage")
+            lg("Isolate is running, executing message")
             val latch = CountDownLatch(1)
             sendBackgroundMessageToExecute(c, backgroundMessage, latch)
             try {
