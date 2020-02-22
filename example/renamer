@@ -1,0 +1,207 @@
+#!/usr/bin/python
+
+import argparse
+import os
+import pathlib
+import shutil
+
+__author__ = 'Mahdi Malvandi'
+__version__ = '0.2.1'
+
+source_folder = ''
+extensions = []
+ignores = []
+partial = True
+verbose = False
+
+
+def log(message=''):
+    if verbose:
+        print(message)
+
+
+def remove_folders(source, folder='build'):
+    for path, subdirs, files in os.walk(source):
+
+        # Check if it's ignored
+        path_ignored = False
+        for i in ignores:
+            if path.startswith(i):
+                path_ignored = True
+                break
+
+        if path_ignored:
+            continue
+        
+        if path[len(source) + 1:].count(os.sep) < 1:
+            for dir in subdirs:
+                if dir == folder:
+                    shutil.rmtree(os.path.join(path, dir))
+
+
+def replace_file_content(source, pairs):
+    for path, subdirs, files in os.walk(source):
+
+        # Check if it's ignored
+        path_ignored = False
+        for i in ignores:
+            if path.startswith(i):
+                path_ignored = True
+                break
+        if path_ignored:
+            continue
+
+        for filename in files:
+            file_path = os.path.join(path, filename)
+            extension = pathlib.Path(file_path).suffix
+            if (not extensions) or (extension in extensions):
+                log("Replacing content of " + file_path)
+                with open(file_path, 'r') as file:
+                    filedata = file.read()
+                for pair in pairs:
+                    filedata = filedata.replace(pair[0], pair[1])
+                with open(file_path, 'w') as file:
+                    file.write(filedata)
+
+
+def replace_file_name(source, old, new):
+    for path, subdirs, files in os.walk(source):
+
+        # Check if it's ignored
+        path_ignored = False
+        for i in ignores:
+            if path.startswith(i):
+                path_ignored = True
+                break
+
+        if path_ignored:
+            log(f'Ignoring {path}')
+            continue
+        
+        for name in files:
+            if (partial and (old in str(name))) or ((not partial) and (old == name)):
+                file_path = os.path.join(path, name)
+                new_name = os.path.join(path, name.replace(old, new))
+                os.rename(file_path, new_name)
+                log(f'Renaming {file_path} to {new_name}')
+
+
+def replace_directory_name(source, old, new):
+    for path, subdirs, files in os.walk(source):
+
+        # Check if it's ignored
+        path_ignored = False
+        for i in ignores:
+            if path.startswith(i):
+                path_ignored = True
+                break
+
+        if path_ignored:
+            continue
+
+        for dir in subdirs:
+            if (partial and (old in dir)) or ((not partial) and (old == dir)):
+                dir_path = os.path.join(path, dir)
+                new_name = os.path.join(path, dir.replace(old, new))
+                os.rename(dir_path, new_name)
+
+
+def create_copy(source, name):
+    if os.path.exists(name):
+        shutil.rmtree(name)
+    shutil.copytree(source, name)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Recursive renaming of directories, file names and file contents.\nUseful for hard transforming a '
+                    'source code into another.')
+    parser.add_argument('-d', '--directory', action='append', nargs=2,
+                        help='Replace first directory name with the second one in all directories recursively')
+    parser.add_argument('-f', '--file', action='append', nargs=2,
+                        help='Replace first file name with the second one in all files')
+    parser.add_argument('-c', '--content', action='append', nargs=2,
+                        help='Replace first string with the second string in all files')
+    parser.add_argument('-r', '--remove', nargs='+', help='Remove the folder specified')
+    parser.add_argument('-x', '--extensions', nargs='*', help='Specify extensions to modify')
+
+    parser.add_argument('-v', '--verbose', action='store_true', default=False)
+    parser.add_argument('-s', '--source', help='The source folder to do the stuff on')
+    parser.add_argument('--copy', nargs=1, help='Create copy instead of playing with the folder itself',
+                        default=False)
+    parser.add_argument('-p', '--partial', action='store_true',
+                        help='If true and part of name sattisfies the condition, it will be considered', default=False)
+    parser.add_argument('-i', '--ignore', nargs='*', help='A list of path that needs to be ignored. Enter path with no / at the first')
+
+    args = parser.parse_args()
+
+    global verbose
+    verbose = args.verbose
+
+    # Check for source existence and copy option
+    if not args.source:
+        print('Specify the source Folder using -s or --source')
+        exit(1)
+    else:
+        global source_folder
+        if args.copy:
+            source_folder = args.copy
+            log(f'Creating a copy folder to work with ({source_folder})')
+            create_copy(args.source, source_folder)
+        else:
+            source_folder = args.source
+
+    log('Source folder to work on: ' + source_folder)
+
+    # Partiality
+    global partial
+    partial = args.partial
+    log(f'Partial is set to {partial}')
+
+    # Extensions
+    if args.extensions:
+        global extensions
+        extensions = args.extensions
+        log(extensions)
+
+    # Ignore
+    if args.ignore:
+        global ignores
+        ignores = [f'{source_folder}/{i}' for i in args.ignore]
+        log(f'Ignoring {ignores}')
+    
+    # Remove folders
+    if args.remove:
+        log('[Step]: Removing folders')
+        for d in args.remove:
+            log(f'Removing {d} from {source_folder} root')
+            remove_folders(source_folder, d)
+
+    # Replace dir name
+    if args.directory:
+        log('[Step]: Replacing direcory names')
+        for pair in args.directory:
+            if len(pair) != 2:
+                log('Non pair element detected. Ignoring.')
+            else:
+                log(f'Replacing dir {pair[0]} with {pair[1]}')
+                replace_directory_name(source_folder, pair[0], pair[1])
+
+    # Replace file name
+    if args.file:
+        log('[Step]: Replacing file name')
+        for pair in args.file:
+            if len(pair) != 2:
+                log('Non pair element detected. Ignoring.')
+            else:
+                replace_file_name(source_folder, pair[0], pair[1])
+
+    # Replace file content
+    if args.content:
+        log('[Step]: Replacing file content')
+        log(f'Contents {args.content}')
+        replace_file_content(source_folder, args.content)
+
+
+if __name__ == "__main__":
+    main()
