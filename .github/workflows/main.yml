@@ -1,0 +1,38 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy-sample:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup git
+        run: |
+          echo "Initializing git"
+          git config --global user.name "Mahdi-Malv"
+          git config --global user.email "mmalvandi75@gmail.com"
+      - uses: webfactory/ssh-agent@v0.2.0
+        with:
+          ssh-private-key: ${{ secrets.ACTION_PRIVATE_KEY }}
+      - name: Rename something to something else using renamer
+        run: |
+          cd example
+          chmod +x renamer
+          ./renamer --source test -x .md -c "pushe_flutter:" "pushe_flutter: ^2.1.0" -c "  path: ../" ""
+          cd ..
+      - name: Push sample
+        run: |
+          rm -rf .git
+          cd example
+          git init
+          git remote add example git@github.com:pusheco/pushe-flutter-sample.git
+          git add -A
+          git commit -m "Update example"
+          git push -f example master
+
