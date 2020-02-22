@@ -2,20 +2,22 @@
 
 A plugin to use Pushe sdk in Flutter framework.
 
-### Run the sample
-
-Run: `git clone https://github.com/pusheco/pushe-flutter.git`<br>
-The go to example: `cd example`<br>
-And run the example on a connected device: `flutter run`<br>
-
 ## Installation
 
 Add the plugin to `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  pushe: ^latest
+  pushe_flutter: 2.1.0
 ```
+* If you want to use the latest version, not necessarily released, you can use the github source code.
+
+```yaml
+pushe_flutter:
+  git:
+    url: https://github.com/pusheco/pushe-flutter.git
+```
+
 Then run `flutter packages get` to sync the libraries.
 
 ### Set up credentials
@@ -38,4 +40,6 @@ import 'package:pushe_flutter/pushe.dart';
 ```
 
 ## More Info
-For more details, visit [HomePage docs](https://docs.pushe.co/)
+
+* For more details, visit [HomePage docs](https://docs.pushe.co/)
+* Sample project is in the library source code and in the [Sample repo on github](https://github.com/pusheco/pushe-flutter-sample)
