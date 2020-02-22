@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pushe_example/utils.dart';
 import 'package:pushe_flutter/pushe.dart';
 
 /// The function is a top level which runs in another isolate.
@@ -51,7 +52,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
   void _updateStatus(String text) async {
     setState(() {
       statusText =
-          '$statusText \n --------------- \n $text \n ${DateTime.now()}';
+          '$statusText \n  \n $text \n ${DateTime.now()}';
     });
   }
 
@@ -111,7 +112,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
             Flexible(
               child: Divider(
                 height: 16.0,
-                color: Colors.blue,
+                color: Colors.blueGrey,
               ),
               flex: 1,
             ),
@@ -126,7 +127,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
                         child: GestureDetector(
                             onDoubleTap: _clearStatus,
                             child: Text(statusText,
-                                style: TextStyle(color: Colors.black))))),
+                                style: TextStyle(color: Colors.blueGrey))))),
               ),
               flex: 6,
             )
@@ -153,7 +154,8 @@ class _PusheSampleState extends State<PusheSampleWidget> {
                     child: Center(
                         child: Text(itemText,
                             style: TextStyle(
-                                color: Theme.of(context).primaryColor,
+                                color: Colors.indigo,
+                                fontWeight: FontWeight.bold,
                                 fontSize: 15.0)))),
               )),
         );
@@ -161,99 +163,17 @@ class _PusheSampleState extends State<PusheSampleWidget> {
     );
   }
 
-  Future<void> alert(Function onOK,
-      {String title: 'Pushe', String message: 'Do you accept?', String ok: 'OK', String no: 'Cancel', Function onNo}) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(message),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text(ok),
-              onPressed: () {
-                onOK();
-                Navigator.of(context).pop();
-              },
-            ),
-            FlatButton(
-              child: Text(no),
-              onPressed: () {
-                onNo?.call();
-                Navigator.of(context).pop();
-              },
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> getInfo(Function(String) onOK,
-      {String title: 'Pushe',
-      String message: 'Do you accept?',
-      String ok: 'OK',
-      String no: 'Nope',
-      Function(String) onNo}) async {
-    return showDialog<String>(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        var result = "";
-        return AlertDialog(
-          title: Text(title),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(message),
-                TextFormField(
-                  decoration: InputDecoration(hintText: title),
-                  onChanged: (text) {
-                    result = text;
-                  },
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text(ok),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                await onOK(result);
-              },
-            ),
-            FlatButton(
-              child: Text(no),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                await onNo?.call(result);
-              },
-            )
-          ],
-        );
-      },
-    );
-  }
-
   ///
   /// All possible actions which come into the list
+  ///
   Map<String, Function> _getActions() {
     return {
       "IDs": () async {
-        alert(() {}, title: 'IDs',
+        alert(context, () {}, title: 'IDs',
         message: "AndroidId:\n${await Pushe.getAndroidId()}\n\nGoogleAdId:\n${await Pushe.getGoogleAdvertisingId()}");
       },
       "Custom ID": () async {
-        await getInfo((text) {
+        await getInfo(context, (text) {
           Pushe.setCustomId(text);
           _updateStatus('CustomId is $text');
         },
@@ -261,7 +181,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
             message: 'Current customId: ${await Pushe.getCustomId()}');
       },
       "PhoneNumber": () async {
-        await getInfo((text) {
+        await getInfo(context, (text) {
           Pushe.setUserPhoneNumber(text);
           _updateStatus('PhoneNumber is $text');
         },
@@ -270,7 +190,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
                 'Current PhoneNumber: ${await Pushe.getUserPhoneNumber()}');
       },
       "Email": () async {
-        await getInfo((text) {
+        await getInfo(context, (text) {
           Pushe.setUserEmail(text);
           _updateStatus('Email is $text');
         },
@@ -284,8 +204,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
         _updateStatus('Device Registered: ${await Pushe.isRegistered()}');
       },
       "Topic": () async {
-        await getInfo(
-            (text) {
+        await getInfo(context, (text) {
               Pushe.subscribe(text, callback: () {
                 _updateStatus('Subscribed to $text');
               });
@@ -304,8 +223,7 @@ Enter topic name to subscribe or unsubscribe:
             });
       },
       "Notification channel": () async {
-        await getInfo(
-            (text) {
+        await getInfo(context, (text) {
               // Create (only name and Id)
               var parts = text.split(":");
               if (parts.length != 2) {
@@ -330,8 +248,7 @@ Enter topic name to subscribe or unsubscribe:
         );
       },
       "Tag (name:value)": () async {
-        await getInfo(
-            (text) {
+        await getInfo(context, (text) {
               var parts = text.split(":");
               if (parts.length != 2) return;
               Pushe.addTags({parts[0]: parts[1]}, callback: () {
@@ -356,13 +273,13 @@ Enter topic name to subscribe or unsubscribe:
             });
       },
       "Analytics: Event": () async {
-        await getInfo((text) {
+        await getInfo(context, (text) {
           Pushe.sendEvent(text);
           _updateStatus('Sending event: $text');
         }, title: 'Event', message: 'Type event name to send');
       },
       "Analytics: Ecommerce": () async {
-        await getInfo((text) {
+        await getInfo(context, (text) {
           var parts = text.split(":");
           if (parts.length != 2) return;
           try {
@@ -377,8 +294,7 @@ Enter topic name to subscribe or unsubscribe:
             message: 'Enter value in name:price format to send data');
       },
       "Notification: AndroidId": () async {
-        await getInfo(
-            (text) async {
+        await getInfo(context, (text) async {
               Pushe.sendNotificationToUser(IdType.AndroidId,
                   await Pushe.getAndroidId(), 'Title for me', 'Content for me');
               _updateStatus('Sending notification to this device');
@@ -395,8 +311,7 @@ Enter topic name to subscribe or unsubscribe:
             });
       },
       "Notification: GoogleAdId": () async {
-        await getInfo(
-            (text) async {
+        await getInfo(context, (text) async {
               Pushe.sendNotificationToUser(
                   IdType.GoogleAdvertisingId,
                   await Pushe.getGoogleAdvertisingId(),
@@ -416,8 +331,7 @@ Enter topic name to subscribe or unsubscribe:
             });
       },
       "Notification: CustomId": () async {
-        await getInfo(
-            (text) {
+        await getInfo(context, (text) {
               Pushe.getCustomId().then((value) {
                 if (value == null || value.isEmpty) {
                   _updateStatus("Can not send by CustomID when there's none");
@@ -439,7 +353,7 @@ Enter topic name to subscribe or unsubscribe:
             });
       },
       "Enable/Disable notification": () async {
-        await alert(() {
+        await alert(context, () {
           Pushe.setNotificationOn();
           _updateStatus("Notifications will be shown");
         }, title: 'Notification', message: 'Current status: ${await Pushe.isNotificationOn() ? "Enabled" : "Disabled" }\nDo you want to enable or disable notification publishing?',
@@ -451,7 +365,7 @@ Enter topic name to subscribe or unsubscribe:
         );
       },
       "Enable/Disable custom sound": () async {
-        await alert(() {
+        await alert(context, () {
           Pushe.enableCustomSound();
           _updateStatus('Custom sound will be played if received');
         }, title: 'Custom sound', message: 'Current status: ${await Pushe.isCustomSoundEnabled() ? "Enabled" : "Disabled"  }\nDo you want to enable or disable custom sound for notification?',
