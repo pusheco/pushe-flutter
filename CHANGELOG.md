@@ -8,7 +8,7 @@
     * `enableCustomSound`
     * `DisableCustomSound`
 - Improvements on analytics methods `sendEvent` and `sendEcommerceData`
-- Added support for background execution to get the callbacks event when the app is fulled killed 
+- Added support for background execution to get the callbacks event when the app is fully killed 
 - Fix bug when clearing `customId`, `userEmail` and `userPhoneNumber`. You can now set null to clear them.
 
 ## 2.0.3
