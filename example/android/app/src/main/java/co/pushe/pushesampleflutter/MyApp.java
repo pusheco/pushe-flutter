@@ -27,6 +27,6 @@ public class MyApp extends FlutterApplication implements PluginRegistry.PluginRe
 
     @Override
     public void registerWith(io.flutter.plugin.common.PluginRegistry registry) {
-        GeneratedPluginRegistrant.registerWith(registry);
+        PushePlugin.registerWith(registry);
     }
 }
