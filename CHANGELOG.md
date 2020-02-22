@@ -1,4 +1,4 @@
-## 2.1.0-rc.1
+## 2.1.0
 
 - Added Support for Android Embedded V2
 - Migrate native language to Kotlin
@@ -9,6 +9,7 @@
     * `DisableCustomSound`
 - Improvements on analytics methods `sendEvent` and `sendEcommerceData`
 - Added support for background execution to get the callbacks event when the app is fulled killed 
+- Fix bug when clearing `customId`, `userEmail` and `userPhoneNumber`. You can now set null to clear them.
 
 ## 2.0.3
 
