@@ -1,6 +1,6 @@
 name: pushe_flutter
 description: Pushe push notification SDK implementation for Flutter framework, for Android and iOS
-version: 2.1.0-rc.1
+version: 2.1.0
 homepage: https://pushe.co
 
 environment:
