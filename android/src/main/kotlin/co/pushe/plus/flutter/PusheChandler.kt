@@ -101,7 +101,8 @@ internal class PusheChandler(private val context: Context,
 
     private fun setCustomId(call: MethodCall, result: MethodChannel.Result) {
         if (!call.hasArgument("id")) {
-            result.error("001", "Call must contain 'id'", null)
+            Pushe.setCustomId(null)
+            result.success(true)
             return
         }
         Pushe.setCustomId(call.argument("id"))
@@ -110,7 +111,7 @@ internal class PusheChandler(private val context: Context,
 
     private fun setUserEmail(call: MethodCall, result: MethodChannel.Result) {
         if (!call.hasArgument("email")) {
-            result.error("002", "Call must contain 'email'", null)
+            result.success(Pushe.setUserEmail(null))
             return
         }
         result.success(Pushe.setUserEmail(call.argument("email")))
@@ -118,7 +119,7 @@ internal class PusheChandler(private val context: Context,
 
     private fun setUserPhoneNumber(call: MethodCall, result: MethodChannel.Result) {
         if (!call.hasArgument("phone")) {
-            result.error("003", "Call must contain 'phone'", null)
+            result.success(Pushe.setUserPhoneNumber(null))
             return
         }
         result.success(Pushe.setUserPhoneNumber(call.argument("phone")))
