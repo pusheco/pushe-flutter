@@ -43,7 +43,10 @@ android {
 }
 
 dependencies {
-    implementation ("co.pushe.plus:base:2.0.4")
+    implementation ("co.pushe.plus:base:2.1.0") {
+        exclude(group: 'co.pushe.plus', module:'rxjava')
+    }
+    implementation("io.reactivex.rxjava2:rxjava:2.2.9")
     api "androidx.multidex:multidex:2.0.1"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

@@ -1,3 +1,8 @@
+## 2.1.1
+- Update native dependency to `pushe:2.1.0`
+- Fix issue with Firebase cloud message v20.1.1 or higher
+- Fix bug with RxJava2
+
 ## 2.1.0
 
 - Added Support for Android Embedded V2
@@ -12,7 +17,6 @@
 - Fix bug when clearing `customId`, `userEmail` and `userPhoneNumber`. You can now set null to clear them.
 
 ## 2.0.3
-
 - Fix bug in notification listeners
 - Improve `sendNotificationToUser` to support multiple IDs
 - Function callbacks will have no boolean status anymore, since there was no false status
@@ -20,26 +24,21 @@
 - Example project improvements
 
 ## 2.0.2
-
 - Fix issue with AndroidX
 
 ## 2.0.1
-
 - Fix formatting of plugin
 - Minor improvements
 
 ## 2.0.0
-
 * Migrate to the new Plus sdk of Pushe
 * Get used of new Plus features in the SDK
 * No initialization is needed for the library
 > Notice the `setNotificationListener` is not fully reliable yet, since it does not handle background
 
 ## 1.1.0-alpha1
-
 * Fixed Battery usage issue
 * Added method `isNotificationOn`
-
 ## 1.0.1
 
 * Fix problem with AndroidX projects.
