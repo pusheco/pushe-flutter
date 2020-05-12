@@ -1,3 +1,7 @@
+## 2.1.1-alpha01
+
+-Update native dependency to `pushe:2.1.1-beta08`
+
 ## 2.1.0
 
 - Added Support for Android Embedded V2
