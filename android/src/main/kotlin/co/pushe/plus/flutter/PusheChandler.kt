@@ -57,6 +57,7 @@ internal class PusheChandler(private val context: Context,
         when (methodName) {
             "Pushe.initialize" -> Pushe.initialize()
             "Pushe.setUserConsentGiven" -> Pushe.setUserConsentGiven()
+            "Pushe.getUserConsentStatus" -> result.success(Pushe.getUserConsentStatus())
             "Pushe.getDeviceId" -> result.success(Pushe.getDeviceId())
             "Pushe.getGoogleAdvertisingId" -> result.success(Pushe.getGoogleAdvertisingId())
             "Pushe.getCustomId" -> result.success(Pushe.getCustomId())

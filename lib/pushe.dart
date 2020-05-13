@@ -87,6 +87,10 @@ class Pushe {
   static Future<void> setUserConsentGiven(bool enabled) async =>
       await _channel.invokeMethod("Pushe.setUserConsentGiven", {"enabled": enabled});
 
+  /// Get the user consent status
+  static Future<bool> getUserConsentStatus() async =>
+      await _channel.invokeMethod("Pushe.getUserConsentStatus");
+
   /// Get the unique id of the devices
   static Future<String> getDeviceId() async =>
       await _channel.invokeMethod("Pushe.getDeviceId");
