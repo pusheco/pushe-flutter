@@ -55,7 +55,9 @@ internal class PusheChandler(private val context: Context,
         val analyticsModule = Pushe.getPusheService(PusheAnalytics::class.java)
 
         when (methodName) {
-            "Pushe.getAndroidId" -> result.success(Pushe.getAndroidId())
+            "Pushe.initialize" -> Pushe.initialize()
+            "Pushe.setUserConsentGiven" -> Pushe.setUserConsentGiven()
+            "Pushe.getDeviceId" -> result.success(Pushe.getDeviceId())
             "Pushe.getGoogleAdvertisingId" -> result.success(Pushe.getGoogleAdvertisingId())
             "Pushe.getCustomId" -> result.success(Pushe.getCustomId())
             "Pushe.setCustomId" -> setCustomId(call, result)
