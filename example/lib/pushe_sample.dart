@@ -170,7 +170,7 @@ class _PusheSampleState extends State<PusheSampleWidget> {
     return {
       "IDs": () async {
         alert(context, () {}, title: 'IDs',
-        message: "AndroidId:\n${await Pushe.getAndroidId()}\n\nGoogleAdId:\n${await Pushe.getGoogleAdvertisingId()}");
+        message: "DeviceId:\n${await Pushe.getDeviceId()}\n\nGoogleAdId:\n${await Pushe.getGoogleAdvertisingId()}");
       },
       "Custom ID": () async {
         await getInfo(context, (text) {
@@ -293,10 +293,10 @@ Enter topic name to subscribe or unsubscribe:
             title: 'Ecommerce',
             message: 'Enter value in name:price format to send data');
       },
-      "Notification: AndroidId": () async {
+      "Notification: DeviceId": () async {
         await getInfo(context, (text) async {
-              Pushe.sendNotificationToUser(IdType.AndroidId,
-                  await Pushe.getAndroidId(), 'Title for me', 'Content for me');
+              Pushe.sendNotificationToUser(IdType.DeviceId,
+                  await Pushe.getDeviceId(), 'Title for me', 'Content for me');
               _updateStatus('Sending notification to this device');
             },
             title: 'Notification',
@@ -306,7 +306,7 @@ Enter topic name to subscribe or unsubscribe:
             no: 'Send to ...',
             onNo: (text) {
               Pushe.sendNotificationToUser(
-                  IdType.AndroidId, text, 'Test title', 'Test content');
+                  IdType.DeviceId, text, 'Test title', 'Test content');
               _updateStatus('Sending notification to AndroidId: $text');
             });
       },

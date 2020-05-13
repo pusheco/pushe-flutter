@@ -9,7 +9,7 @@ import 'package:flutter/widgets.dart';
 /// Enum: Notification id type
 /// @author Mahdi Malvandi
 ///
-enum IdType { AndroidId, GoogleAdvertisingId, CustomId }
+enum IdType { DeviceId, GoogleAdvertisingId, CustomId }
 enum EventAction { custom, sign_up, login, purchase, achievement, level }
 
 void _pusheSetupBackgroundChannel() async {
