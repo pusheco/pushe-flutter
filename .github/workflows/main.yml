@@ -24,7 +24,7 @@ jobs:
         run: |
           cd example
           chmod +x renamer
-          ./renamer --source . -x .yaml -c "pushe_flutter:" "pushe_flutter: ^2.1.0" -c "  path: ../" ""
+          ./renamer --source . -x .yaml -c "pushe_flutter:" "pushe_flutter: ^2.1.1" -c "  path: ../" ""
           rm renamer
           cd ..
       - name: Push sample

@@ -8,7 +8,7 @@ Add the plugin to `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  pushe_flutter: 2.1.1-beta08
+  pushe_flutter: $latest
 ```
 * If you want to use the latest version, not necessarily released, you can use the github source code.
 
