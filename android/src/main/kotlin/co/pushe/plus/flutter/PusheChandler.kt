@@ -55,11 +55,11 @@ internal class PusheChandler(private val context: Context,
         val analyticsModule = Pushe.getPusheService(PusheAnalytics::class.java)
 
         when (methodName) {
-            "Pushe.getAndroidId" -> result.success(Pushe.getAndroidId())
             "Pushe.initialize" -> Pushe.initialize()
-            "Pushe.setUserConsentGiven" -> Pushe.setUserConsentGiven()
+            "Pushe.setUserConsentGiven" -> setUserConsentGiven(call, result)
             "Pushe.getUserConsentStatus" -> result.success(Pushe.getUserConsentStatus())
             "Pushe.getDeviceId" -> result.success(Pushe.getDeviceId())
+            "Pushe.getAndroidId" -> result.success(Pushe.getAndroidId())
             "Pushe.getGoogleAdvertisingId" -> result.success(Pushe.getGoogleAdvertisingId())
             "Pushe.getCustomId" -> result.success(Pushe.getCustomId())
             "Pushe.setCustomId" -> setCustomId(call, result)
@@ -88,7 +88,6 @@ internal class PusheChandler(private val context: Context,
                 result.success(true)
             }
             "Pushe.setInitializationCompleteListener" -> Pushe.setInitializationCompleteListener {
-                // Done
                 result.success(true)
             }
             "Pushe.addTags" -> addTag(call, result)
@@ -102,6 +101,15 @@ internal class PusheChandler(private val context: Context,
     }
 
     ///// Do stuff when a method was called
+
+    private fun setUserConsentGiven(call: MethodCall, result: MethodChannel.Result) {
+        try {
+            Pushe.setUserConsentGiven(call.argument<Boolean>("enabled") ?: true)
+            result.success(true)
+        } catch (e: java.lang.Exception) {
+            result.error("022", "Error occorred when parsing `enabled` argument. Must be of type bool", e.message)
+        }
+    }
 
     private fun setCustomId(call: MethodCall, result: MethodChannel.Result) {
         if (!call.hasArgument("id")) {

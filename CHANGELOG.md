@@ -1,5 +1,13 @@
-## 2.1.1-alpha01
+## 2.1.1
+- Update Native Android dependency to `pushe:2.1.1`
+- Custom RxJava is used to avoid large size when not needed.
+    - If developer or any library is using RxJava, `duplicate` error might be thrown.
+    In that case you should exclude RxJava and instead implement a normal version.
+- Added support for GDPR compliance
+- Native library has been migrated to AndroidX
+- Deprecate `getAndroidId`. Instead, `getDeviceId` should be used
 
+## 2.1.1-alpha01
 -Update native dependency to `pushe:2.1.1-beta08`
 
 ## 2.1.0

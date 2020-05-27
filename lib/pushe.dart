@@ -71,11 +71,6 @@ class Pushe {
   static const MethodChannel _channel =
       const MethodChannel('plus.pushe.co/pushe_flutter');
 
-  @deprecated
-  /// Use getDeviceId instead
-  static Future<String> getAndroidId() async =>
-      await _channel.invokeMethod("Pushe.getAndroidId");
-
   /// GDPR related
   /// You can use this function after getting user consent to initialize pushe lib
   static Future<void> initialize() async =>
@@ -99,6 +94,10 @@ class Pushe {
   /// Get the unique id of the devices
   static Future<String> getDeviceId() async =>
       await _channel.invokeMethod("Pushe.getDeviceId");
+
+  @Deprecated('Use `getDeviceId` instead')
+  static Future<String> getAndroidId() async =>
+      await _channel.invokeMethod("Pushe.getAndroidId");
 
   /// Get google advertising id
   static Future<String> getGoogleAdvertisingId() async =>
