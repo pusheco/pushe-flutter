@@ -1,3 +1,5 @@
+ [![pub package](https://img.shields.io/pub/v/pushe_flutter)](https://pub.dartlang.org/packages/pushe_flutter)
+
 # Pushe flutter
 
 [Pushe](https://pushe.co) notification service official plugin for Flutter.
