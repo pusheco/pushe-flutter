@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
+import androidx.annotation.RequiresApi
 import co.pushe.plus.Pushe
 import co.pushe.plus.analytics.PusheAnalytics
 import co.pushe.plus.analytics.event.Ecommerce
@@ -413,7 +415,9 @@ internal class PusheChandler(private val context: Context,
             val ledColor: Int = call.argument<Int>("ledColor") ?: 0
             val vibrationPattern: LongArray? = call.argument<LongArray>("vibrationPattern")
 
-            notificationModule.createNotificationChannel(channelId, channelName, description, importance, enableLight, enableVibration, showBadge, ledColor, vibrationPattern)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                notificationModule.createNotificationChannel(channelId, channelName, description, importance, enableLight, enableVibration, showBadge, ledColor, vibrationPattern)
+            }
             result.success(true)
         } catch (e: Exception) {
             result.error("019", "Could not create notification channel.\n ${e.message}", null)
@@ -429,7 +433,9 @@ internal class PusheChandler(private val context: Context,
             result.error("021", "Call must contain 'channelId' which is not null.", null)
             return
         }
-        notificationModule.removeNotificationChannel(call.argument<Any>("channelId") as String)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationModule.removeNotificationChannel(call.argument<Any>("channelId") as String)
+        }
         result.success(true)
     }
 

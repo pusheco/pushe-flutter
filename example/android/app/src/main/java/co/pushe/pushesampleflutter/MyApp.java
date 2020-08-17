@@ -1,9 +1,7 @@
 package co.pushe.pushesampleflutter;
 
 import android.content.Context;
-
 import androidx.multidex.MultiDex;
-
 import co.pushe.plus.flutter.PusheFlutterApplication;
 import co.pushe.plus.flutter.PushePlugin;
 import io.flutter.app.FlutterApplication;
