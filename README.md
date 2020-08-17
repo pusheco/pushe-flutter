@@ -1,8 +1,8 @@
- [![pub package](https://img.shields.io/pub/v/pushe_flutter)](https://pub.dartlang.org/packages/pushe_flutter)
-
 # Pushe flutter
 
-[Pushe](https://pushe.co) notification service official plugin for Flutter.
+**Pushe** notification service official plugin for Flutter. Pushe is a push notification service. Refer to [Pushe Homepage](https://pushe.co) for more information.
+
+> **NOTE**: **iOS** features are in development. Current version does not support iOS.
 
 ## Installation
 
@@ -12,7 +12,9 @@ Add the plugin to `pubspec.yaml`:
 dependencies:
   pushe_flutter: $latest
 ```
-* If you want to use the latest version, not necessarily released, you can use the github source code.
+ [![pub package](https://img.shields.io/pub/v/pushe_flutter)](https://pub.dartlang.org/packages/pushe_flutter)
+
+* If you want to use the latest version, not necessarily released and stable, you can directly use the source code on Github.
 
 ```yaml
 pushe_flutter:
@@ -20,29 +22,35 @@ pushe_flutter:
     url: https://github.com/pusheco/pushe-flutter.git
 ```
 
+## How to use Pushe
+
 Then run `flutter packages get` to sync the libraries.
 
-### Set up credentials
 
-Go to https://console.pushe.co , create an application with the same package name and get the manifest tag. Add the manifest tag in the `Application` tag. It should be something like this:
+### Set up credentials
+#### Android:
+* Go to [Pushe console](https://console.pushe.co)
+* Create an application
+* Copy the credentials. An XML `meta-data` tag like below:
 
 ```xml
 <meta-data android:name="pushe_token"
            android:value="PUSHE_TOKEN" />
 ```
+* Paste it into `Appliacation` tag of the **AndroidManifest.xml** file in the following directory:
+> `android/app/src/main/AndroidManifest.xml`
 
-Run the project after and you should be able to see your device in [console](https://console.pushe.co) after a short time.
 
-### Add the code snippets
+Run the project after and you should be able to see your device id in [console](https://console.pushe.co) after a short time.
 
-In your `main.dart`:
+#### iOS:
+> iOS features in progress
 
-```dart
-import 'package:pushe_flutter/pushe.dart';
-```
+---
+
+Visit the [**Documentation**](https://docs.pushe.co/docs/flutter/intro/) for API references.
 
 ## More Info
 
-* For more details, visit [HomePage docs](https://docs.pushe.co/)
-* FAQ and issues in [Github repo](https://github.com/pusheco/pushe-flutter/issues?q=is%3Aissue+).
+* FAQ and issues in [Github repo](https://github.com/pusheco/pushe-flutter/issues?q=is%3Aissue+)
 * Sample project is in the library source code and in the [Sample repo on github](https://github.com/pusheco/pushe-flutter-sample)
