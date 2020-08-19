@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pushe_example/utils.dart';
 import 'package:pushe_flutter/pushe.dart';
@@ -9,7 +10,7 @@ import 'package:pushe_flutter/pushe.dart';
 ///    if the type is 'customContent' it will have only 'json'.
 ///    if the type is 'buttonClick', it will contain 'data' and 'button'.
 pusheBackgroundMessageHandler(String eventType, dynamic message) {
-  switch(eventType) {
+  switch (eventType) {
     case Pushe.notificationReceived:
       var notificationData = NotificationData.fromDynamic(message);
       print('Notification received in background $notificationData');
@@ -24,7 +25,8 @@ pusheBackgroundMessageHandler(String eventType, dynamic message) {
       break;
     case Pushe.notificationButtonClicked:
       var notificationData = NotificationData.fromDynamic(message);
-      print('Notification button clicked in background $notificationData & clicked button is ${notificationData.clickedButton}');
+      print(
+          'Notification button clicked in background $notificationData & clicked button is ${notificationData.clickedButton}');
       break;
     case Pushe.customContentReceived:
       // Message is a map and can not be parsed
@@ -45,32 +47,46 @@ class _PusheSampleState extends State<PusheSampleWidget> {
 
   @override
   void initState() {
-    _implementListeners();
     super.initState();
+    _implementListeners();
   }
 
   void _updateStatus(String text) async {
     setState(() {
-      statusText =
-          '$statusText \n  \n $text \n ${DateTime.now()}';
+      statusText = '$statusText \n  \n $text \n ${DateTime.now()}';
     });
   }
 
   void _implementListeners() {
     Pushe.setNotificationListener(
-      onReceived: (notificationData) =>
-          _updateStatus('Notification received: $notificationData'),
-      onClicked: (notificationData) =>
-          _updateStatus('Notification clicked: $notificationData'),
-      onDismissed: (notificationData) =>
-          _updateStatus('Notification dismissed: $notificationData'),
-      onButtonClicked: (notificationData) => _updateStatus(
-          'Notification button clicked: $notificationData, ${notificationData.clickedButton}'),
-      onCustomContentReceived: (customContent) =>
-          _updateStatus('Notification custom content received: $customContent'),
-      // This function only works in background
-      onBackgroundNotificationReceived: pusheBackgroundMessageHandler
-    );
+        onReceived: (notificationData) =>
+            _updateStatus('Notification received: $notificationData'),
+        onClicked: (notificationData) =>
+            _updateStatus('Notification clicked: $notificationData'),
+        onDismissed: (notificationData) =>
+            _updateStatus('Notification dismissed: $notificationData'),
+        onButtonClicked: (notificationData) => _updateStatus(
+            'Notification button clicked: $notificationData, ${notificationData.clickedButton}'),
+        onCustomContentReceived: (customContent) => _updateStatus(
+            'Notification custom content received: $customContent'),
+        // This function only works in background
+        onBackgroundNotificationReceived: pusheBackgroundMessageHandler);
+    Pushe.setInAppMessagingListener(onReceived: (inAppMessage) {
+      _updateStatus(
+          '[InApp was received]\nTitle:${inAppMessage.title}\nContent:${inAppMessage.content}');
+    }, onTriggered: (inAppMessage) {
+      _updateStatus(
+          '[InApp was triggered]\nTitle:${inAppMessage.title}\nContent:${inAppMessage.content}');
+    }, onClicked: (inAppMessage) {
+      _updateStatus(
+          '[InApp was clicked]\nTitle:${inAppMessage.title}\nContent:${inAppMessage.content}');
+    }, onDismissed: (inAppMessage) {
+      _updateStatus(
+          '[InApp was dismissed]\nTitle:${inAppMessage.title}\nContent:${inAppMessage.content}');
+    }, onButtonClicked: (inAppMessage, buttonIndex) {
+      _updateStatus(
+          '[InApp button was clicked]\nTitle:${inAppMessage.title}\nContent:${inAppMessage.content}\nButton: ${inAppMessage.buttons[buttonIndex].text}');
+    });
   }
 
   void _clearStatus() {
@@ -169,8 +185,10 @@ class _PusheSampleState extends State<PusheSampleWidget> {
   Map<String, Function> _getActions() {
     return {
       "IDs": () async {
-        alert(context, () {}, title: 'IDs',
-        message: "DeviceId:\n${await Pushe.getDeviceId()}\n\nGoogleAdId:\n${await Pushe.getGoogleAdvertisingId()}");
+        alert(context, () {},
+            title: 'IDs',
+            message:
+                "DeviceId:\n${await Pushe.getDeviceId()}\n\nGoogleAdId:\n${await Pushe.getGoogleAdvertisingId()}");
       },
       "Custom ID": () async {
         await getInfo(context, (text) {
@@ -204,7 +222,9 @@ class _PusheSampleState extends State<PusheSampleWidget> {
         _updateStatus('Device Registered: ${await Pushe.isRegistered()}');
       },
       "Topic": () async {
-        await getInfo(context, (text) {
+        await getInfo(
+            context,
+            (text) {
               Pushe.subscribe(text, callback: () {
                 _updateStatus('Subscribed to $text');
               });
@@ -214,16 +234,18 @@ class _PusheSampleState extends State<PusheSampleWidget> {
 Topics: ${(await Pushe.getSubscribedTopics()).toString()}\n
 Enter topic name to subscribe or unsubscribe:
         """,
-            ok: 'Subscribe',
-            no: 'Unsubscribe',
-            onNo: (text) {
+            positive: 'Subscribe',
+            negative: 'Unsubscribe',
+            onNegative: (text) {
               Pushe.unsubscribe(text, callback: () {
                 _updateStatus('Unsubscribed from $text');
               });
             });
       },
       "Notification channel": () async {
-        await getInfo(context, (text) {
+        await getInfo(
+            context,
+            (text) {
               // Create (only name and Id)
               var parts = text.split(":");
               if (parts.length != 2) {
@@ -236,19 +258,21 @@ Enter topic name to subscribe or unsubscribe:
               Pushe.createNotificationChannel(id, name);
               _updateStatus("Create notification channel $name");
             },
-          title: "Channel",
-          message: 'Enter channel id and name in id:name format and tap create to create a channel\nOr enter channel id and tap remove to remove a channel',
-          ok: 'Create',
-          no: "Remove",
-          onNo: (text) {
+            title: "Channel",
+            message:
+                'Enter channel id and name in id:name format and tap create to create a channel\nOr enter channel id and tap remove to remove a channel',
+            positive: 'Create',
+            negative: "Remove",
+            onNegative: (text) {
               var id = text;
               Pushe.removeNotificationChannel(id);
               _updateStatus('Remove notification channel with id $id');
-          }
-        );
+            });
       },
       "Tag (name:value)": () async {
-        await getInfo(context, (text) {
+        await getInfo(
+            context,
+            (text) {
               var parts = text.split(":");
               if (parts.length != 2) return;
               Pushe.addTags({parts[0]: parts[1]}, callback: () {
@@ -262,9 +286,9 @@ Enter topic name to subscribe or unsubscribe:
         Tag in name:value format (add)
         Tag in name1,name2 format (remove)
         """,
-            ok: 'Add',
-            no: 'Remove',
-            onNo: (text) {
+            positive: 'Add',
+            negative: 'Remove',
+            onNegative: (text) {
               var parts = text.split(",");
               if (parts == null || parts.isEmpty) return;
               Pushe.removeTags(parts, callback: () {
@@ -294,7 +318,9 @@ Enter topic name to subscribe or unsubscribe:
             message: 'Enter value in name:price format to send data');
       },
       "Notification: DeviceId": () async {
-        await getInfo(context, (text) async {
+        await getInfo(
+            context,
+            (text) async {
               Pushe.sendNotificationToUser(IdType.DeviceId,
                   await Pushe.getDeviceId(), 'Title for me', 'Content for me');
               _updateStatus('Sending notification to this device');
@@ -302,16 +328,18 @@ Enter topic name to subscribe or unsubscribe:
             title: 'Notification',
             message:
                 'Enter androidId to send a simple notification to the user',
-            ok: 'Send to me',
-            no: 'Send to ...',
-            onNo: (text) {
+            positive: 'Send to me',
+            negative: 'Send to ...',
+            onNegative: (text) {
               Pushe.sendNotificationToUser(
                   IdType.DeviceId, text, 'Test title', 'Test content');
               _updateStatus('Sending notification to AndroidId: $text');
             });
       },
       "Notification: GoogleAdId": () async {
-        await getInfo(context, (text) async {
+        await getInfo(
+            context,
+            (text) async {
               Pushe.sendNotificationToUser(
                   IdType.GoogleAdvertisingId,
                   await Pushe.getGoogleAdvertisingId(),
@@ -322,16 +350,18 @@ Enter topic name to subscribe or unsubscribe:
             title: 'Notification',
             message:
                 'Enter GoogleAdID to send a simple notification to the user',
-            ok: 'Send to me',
-            no: 'Send to ...',
-            onNo: (text) {
+            positive: 'Send to me',
+            negative: 'Send to ...',
+            onNegative: (text) {
               Pushe.sendNotificationToUser(IdType.GoogleAdvertisingId, text,
                   'Test title', 'Test content');
               _updateStatus('Sending notification to GoogleAdID: $text');
             });
       },
       "Notification: CustomId": () async {
-        await getInfo(context, (text) {
+        await getInfo(
+            context,
+            (text) {
               Pushe.getCustomId().then((value) {
                 if (value == null || value.isEmpty) {
                   _updateStatus("Can not send by CustomID when there's none");
@@ -344,38 +374,93 @@ Enter topic name to subscribe or unsubscribe:
             },
             title: 'Notification',
             message: 'Enter CustomId to send a simple notification to the user',
-            ok: 'Send to me',
-            no: 'Send to ...',
-            onNo: (text) {
+            positive: 'Send to me',
+            negative: 'Send to ...',
+            onNegative: (text) {
               Pushe.sendNotificationToUser(
                   IdType.CustomId, text, 'Test title', 'Test content');
               _updateStatus('Sending notification to CustomId: $text');
             });
       },
       "Enable/Disable notification": () async {
-        await alert(context, () {
-          Pushe.setNotificationOn();
-          _updateStatus("Notifications will be shown");
-        }, title: 'Notification', message: 'Current status: ${await Pushe.isNotificationOn() ? "Enabled" : "Disabled" }\nDo you want to enable or disable notification publishing?',
-        ok: 'Enable', no: 'Disable',
-        onNo: () {
-          Pushe.setNotificationOff();
-          _updateStatus("Notifications won't be shown if received");
-        }
-        );
+        await alert(
+            context,
+            () {
+              Pushe.setNotificationOn();
+              _updateStatus("Notifications will be shown");
+            },
+            title: 'Notification',
+            message:
+                'Current status: ${await Pushe.isNotificationOn() ? "Enabled" : "Disabled"}\nDo you want to enable or disable notification publishing?',
+            ok: 'Enable',
+            no: 'Disable',
+            onNo: () {
+              Pushe.setNotificationOff();
+              _updateStatus("Notifications won't be shown if received");
+            });
       },
       "Enable/Disable custom sound": () async {
-        await alert(context, () {
-          Pushe.enableCustomSound();
-          _updateStatus('Custom sound will be played if received');
-        }, title: 'Custom sound', message: 'Current status: ${await Pushe.isCustomSoundEnabled() ? "Enabled" : "Disabled"  }\nDo you want to enable or disable custom sound for notification?',
-        ok: 'Enable', no: 'Disable',
-        onNo: () {
-          Pushe.disableCustomSound();
-          _updateStatus("Custom sound won't be played if received");
+        await alert(
+            context,
+            () {
+              Pushe.enableCustomSound();
+              _updateStatus('Custom sound will be played if received');
+            },
+            title: 'Custom sound',
+            message:
+                'Current status: ${await Pushe.isCustomSoundEnabled() ? "Enabled" : "Disabled"}\nDo you want to enable or disable custom sound for notification?',
+            ok: 'Enable',
+            no: 'Disable',
+            onNo: () {
+              Pushe.disableCustomSound();
+              _updateStatus("Custom sound won't be played if received");
+            });
+      },
+      "InApp: trigger event": () async {
+        getInfo(context, (value) async {
+          if (value.isNotEmpty) {
+            _updateStatus('Triggering local event $value');
+            await Pushe.triggerEvent(value);
+            _updateStatus('Event triggered');
+          }
+        }, title: 'InApp event', message: 'Enter name of event');
+      },
+      "InApp: Toggle in app display": () async {
+        if (await Pushe.isInAppMessagingEnabled()) {
+          _updateStatus('Disabling InAppMessaging');
+          await Pushe.disableInAppMessaging();
+          _updateStatus('InApp display is OFF');
+        } else {
+          _updateStatus('Enabling InAppMessaging');
+          await Pushe.enableInAppMessaging();
+          _updateStatus('InApp display is ON');
         }
+      },
+      "InApp: dismiss shown InApp message": () async {
+        Pushe.dismissShownInApp();
+      },
+      "InApp: Send test message (Test)": () async {
+        getInfo(
+            context,
+                (value) {
+              // ignore: invalid_use_of_visible_for_testing_member
+              Pushe.testInAppMessage(value, instant: false);
+            },
+            title: 'TEST: InApp',
+            message:
+            'Enter the desired message\nInstant: It will not wait for trigger and just shows it\nNotInstant: Exactly behaves as a real message',
+            positive: 'Not instant',
+            negative: 'Instant',
+            onNegative: (value) async {
+              // ignore: invalid_use_of_visible_for_testing_member
+              Pushe.testInAppMessage(value, instant: true);
+            }
         );
       },
+      "ReImplement listeners": () {
+        _updateStatus('Listeners re-implemented');
+        _implementListeners();
+      }
     };
   }
 }

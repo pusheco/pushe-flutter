@@ -36,12 +36,12 @@ Future<void> alert(BuildContext context, Function onOK,
   );
 }
 
-Future<void> getInfo(BuildContext context, Function(String) onOK,
+Future<void> getInfo(BuildContext context, Function(String) onPositive,
     {String title: 'Pushe',
       String message: 'Do you accept?',
-      String ok: 'OK',
-      String no: 'Nope',
-      Function(String) onNo}) async {
+      String positive: 'OK',
+      String negative: 'Cancel',
+      Function(String) onNegative}) async {
   return showDialog<String>(
     context: context,
     barrierDismissible: true,
@@ -64,17 +64,17 @@ Future<void> getInfo(BuildContext context, Function(String) onOK,
         ),
         actions: <Widget>[
           FlatButton(
-            child: Text(ok),
+            child: Text(positive),
             onPressed: () async {
               Navigator.of(context).pop();
-              await onOK(result);
+              await onPositive(result);
             },
           ),
           FlatButton(
-            child: Text(no),
+            child: Text(negative),
             onPressed: () async {
               Navigator.of(context).pop();
-              await onNo?.call(result);
+              await onNegative?.call(result);
             },
           )
         ],
