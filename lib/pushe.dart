@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
-
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -13,7 +12,8 @@ enum IdType { DeviceId, GoogleAdvertisingId, CustomId }
 enum EventAction { custom, sign_up, login, purchase, achievement, level }
 
 void _pusheSetupBackgroundChannel() async {
-  MethodChannel backgroundChannel = const MethodChannel('plus.pushe.co/pushe_flutter_background');
+  MethodChannel backgroundChannel =
+      const MethodChannel('plus.pushe.co/pushe_flutter_background');
   // Setup Flutter state needed for MethodChannels.
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -28,16 +28,17 @@ void _pusheSetupBackgroundChannel() async {
       try {
         var dataArg = call.arguments['message'];
         if (dataArg == null) {
-          print('Data received from callback is null');
           return;
         }
         Map wholeData = jsonDecode(dataArg);
         String eventType = wholeData['type'];
-        Map messageContent = eventType == "custom_content" ? wholeData['json'] :  wholeData['data'];
+        Map messageContent = eventType == "custom_content"
+            ? wholeData['json']
+            : wholeData['data'];
 
         await handlerFunction(eventType, messageContent);
       } catch (e) {
-        print('Unable to handle incoming background message.\n$e');
+        print('Pushe: Unable to handle incoming background message.\n$e');
       }
     }
     return Future.value();
@@ -60,13 +61,19 @@ class Pushe {
   static const String notificationButtonClicked = 'button_click';
   static const String customContentReceived = 'custom_content';
 
-  // Callback handlers
+  // Notification Callback handlers
   static void Function(NotificationData) _receiveCallback;
   static void Function(NotificationData) _clickCallback;
   static void Function(NotificationData) _dismissCallback;
   static void Function(dynamic) _customContentCallback;
-  static void Function(NotificationData)
-      _buttonClickCallback;
+  static void Function(NotificationData) _buttonClickCallback;
+
+  // InAppMessage callback handlers
+  static void Function(InAppMessage) _inAppReceiveCallback;
+  static void Function(InAppMessage) _inAppTriggerCallback;
+  static void Function(InAppMessage) _inAppClickCallback;
+  static void Function(InAppMessage) _inAppDismissCallback;
+  static void Function(InAppMessage, int) _inAppButtonClickCallback;
 
   static const MethodChannel _channel =
       const MethodChannel('plus.pushe.co/pushe_flutter');
@@ -84,8 +91,8 @@ class Pushe {
   /// Simply call this function with False parameter
   /// [enabled] enable or disable user consent for collecting extra data
   ///
-  static Future<void> setUserConsentGiven(bool enabled) async =>
-      await _channel.invokeMethod("Pushe.setUserConsentGiven", {"enabled": enabled});
+  static Future<void> setUserConsentGiven(bool enabled) async => await _channel
+      .invokeMethod("Pushe.setUserConsentGiven", {"enabled": enabled});
 
   /// Get the user consent status
   static Future<bool> getUserConsentStatus() async =>
@@ -199,6 +206,45 @@ class Pushe {
   /// To check whether custom sound is already enabled or not
   static Future<bool> isCustomSoundEnabled() async =>
       await _channel.invokeMethod("Pushe.isCustomSoundEnabled");
+
+  // region InAppMessage
+
+  static Future<void> triggerEvent(String eventName) async =>
+      await _channel.invokeMethod("Pushe.triggerEvent", {'event': eventName});
+
+  static Future<void> disableInAppMessaging() async =>
+      await _channel.invokeMethod("Pushe.disableInAppMessaging");
+
+  static Future<void> enableInAppMessaging() async =>
+      await _channel.invokeMethod("Pushe.enableInAppMessaging");
+
+  static Future<bool> isInAppMessagingEnabled() async =>
+      await _channel.invokeMethod<bool>("Pushe.isInAppMessagingEnabled");
+
+  static Future<void> dismissShownInApp() async =>
+      await _channel.invokeMethod("Pushe.dismissShownInApp");
+
+  @visibleForTesting
+  static Future<void> testInAppMessage(String message, {bool instant = false}) async =>
+      await _channel.invokeMethod(
+          "Pushe.testInAppMessage", {'message': message, 'instant': instant});
+
+  static setInAppMessagingListener({
+    Function(InAppMessage) onReceived,
+    Function(InAppMessage) onTriggered,
+    Function(InAppMessage) onClicked,
+    Function(InAppMessage) onDismissed,
+    Function(InAppMessage, int) onButtonClicked,
+  }) async {
+    _inAppReceiveCallback = onReceived;
+    _inAppClickCallback = onClicked;
+    _inAppDismissCallback = onDismissed;
+    _inAppTriggerCallback = onTriggered;
+    _inAppButtonClickCallback = onButtonClicked;
+    await _channel.invokeMethod("Pushe.initializeInAppListeners");
+  }
+
+  // endregion
 
   /// Creates a channel using native API. Read more about channel at https://developer.android.com/training/notify-user/channels
   /// You can send notifications through only one channel, so users that have created that channel in their devices, can receive it,
@@ -394,31 +440,59 @@ class Pushe {
   ///
   static Future<Null> _handleMethod(MethodCall call) async {
     dynamic arg = jsonDecode(call.arguments);
-
-    if (call.method == 'Pushe.onNotificationReceived') {
-      _receiveCallback?.call(NotificationData.fromDynamic(arg['data']));
-    } else if (call.method == 'Pushe.onNotificationClicked') {
-      _clickCallback?.call(NotificationData.fromDynamic(arg['data']));
-    } else if (call.method == 'Pushe.onNotificationButtonClicked') {
-      try {
-        _buttonClickCallback?.call(NotificationData.fromDynamic(arg['data']));
-      } catch (e) {
-        print(
-            'Pushe: Error passing notification data to callback ${e.toString()}');
-      }
-    } else if (call.method == 'Pushe.onCustomContentReceived') {
-      try {
-        var customContent = arg['json'];
-        _customContentCallback?.call(customContent);
-      } catch (e) {
-        print('Pushe: Error passing customContent to callback');
-      }
-    } else if (call.method == 'Pushe.onNotificationDismissed') {
-      _dismissCallback?.call(NotificationData.fromDynamic(arg['data']));
+    var callMethod = call.method;
+    switch (callMethod) {
+      case 'Pushe.onNotificationReceived':
+        _receiveCallback?.call(NotificationData.fromDynamic(arg['data']));
+        break;
+      case 'Pushe.onNotificationClicked':
+        _clickCallback?.call(NotificationData.fromDynamic(arg['data']));
+        break;
+      case 'Pushe.onNotificationButtonClicked':
+        try {
+          _buttonClickCallback?.call(NotificationData.fromDynamic(arg['data']));
+        } catch (e) {
+          print(
+              'Pushe: Error passing notification data to callback ${e.toString()}');
+        }
+        break;
+      case 'Pushe.onCustomContentReceived':
+        try {
+          var customContent = arg['json'];
+          _customContentCallback?.call(customContent);
+        } catch (e) {
+          print('Pushe: Error passing customContent to callback');
+        }
+        break;
+      case 'Pushe.onNotificationDismissed':
+        _dismissCallback?.call(NotificationData.fromDynamic(arg['data']));
+        break;
+      // InAppMessaging
+      case 'Pushe.inAppMessageReceived':
+        _inAppReceiveCallback?.call(InAppMessage.fromDynamic(arg['piam']));
+        break;
+      case 'Pushe.inAppMessageTriggered':
+        _inAppTriggerCallback?.call(InAppMessage.fromDynamic(arg['piam']));
+        break;
+      case 'Pushe.inAppMessageClicked':
+        _inAppClickCallback?.call(InAppMessage.fromDynamic(arg['piam']));
+        break;
+      case 'Pushe.inAppMessageButtonClicked':
+        _inAppButtonClickCallback?.call(
+          InAppMessage.fromDynamic(arg['message']['piam']),
+          int.parse(arg['index'], onError: (_) => -1),
+        );
+        break;
+      case 'Pushe.inAppMessageDismissed':
+        _inAppDismissCallback?.call(InAppMessage.fromDynamic(arg['piam']));
+        break;
     }
+
     return null;
   }
 }
+
+// region Notification
 
 ///
 /// Notification data class as an interface between native callback data classes and Flutter dart code.
@@ -435,8 +509,6 @@ class NotificationData {
   dynamic _customContent;
   List<NotificationButtonData> _buttons;
   NotificationButtonData _clickedButton;
-
-  NotificationData._();
 
   NotificationData.create(
       this._title,
@@ -461,7 +533,7 @@ class NotificationData {
       NotificationButtonData clickedButton;
       try {
         clickedButton = NotificationButtonData.fromMap(data['clickedButton']);
-      } catch(e) {
+      } catch (e) {
         clickedButton = null;
       }
       return NotificationData.create(
@@ -509,11 +581,10 @@ class NotificationData {
 /// When there are buttons in the notification they are accessible through callbacks.
 /// For every button there would be an object in the callback notification data object.
 /// And also when a button is clicked, it's id and text will be passes separately in `onNotificationButtonClicked` callback.
+
 class NotificationButtonData {
   String _title;
   String _icon;
-
-  NotificationButtonData._();
 
   NotificationButtonData.create(this._title, this._icon);
 
@@ -541,3 +612,51 @@ class NotificationButtonData {
     return buttonDataList;
   }
 }
+
+// endregion
+
+// region InAppMessaging
+
+class InAppMessage {
+  String _title, _content;
+  List<InAppMessageButton> _buttons;
+
+  get title => _title;
+
+  get content => _content;
+
+  get buttons => _buttons;
+
+  InAppMessage.create(this._title, this._content, this._buttons);
+
+  InAppMessage.fromDynamic(dynamic data) {
+    if (data == null) {
+      return;
+    }
+    _title = data['title'] as String;
+    _content = data['content'] as String;
+    List<InAppMessageButton> buttons = [];
+    try {
+      for (var i in data['buttons'] as List) {
+        buttons.add(InAppMessageButton.fromDynamic(i));
+      }
+    } catch (e) {
+      print('Pushe: Failed to parse inApp buttons: $e}');
+    }
+    _buttons = buttons;
+  }
+}
+
+class InAppMessageButton {
+  String _text;
+
+  get text => _text;
+
+  InAppMessageButton(this._text);
+
+  InAppMessageButton.fromDynamic(dynamic data) {
+    _text = data['text'] as String;
+  }
+}
+
+// endregion
