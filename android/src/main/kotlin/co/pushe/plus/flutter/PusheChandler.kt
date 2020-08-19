@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
-import androidx.annotation.RequiresApi
+import androidx.annotation.VisibleForTesting
 import co.pushe.plus.Pushe
 import co.pushe.plus.analytics.PusheAnalytics
 import co.pushe.plus.analytics.event.Ecommerce
@@ -13,10 +13,12 @@ import co.pushe.plus.analytics.event.Event
 import co.pushe.plus.analytics.event.EventAction
 import co.pushe.plus.flutter.HandleStorage.saveMessageHandle
 import co.pushe.plus.flutter.HandleStorage.saveSetupHandle
+import co.pushe.plus.flutter.InAppUtils.getInAppMessageAndButtonFromIntent
+import co.pushe.plus.flutter.InAppUtils.getInAppMessageFromIntent
 import co.pushe.plus.flutter.Pack.getCustomContentFromIntent
-import co.pushe.plus.flutter.Pack.getNotificationAndButtonFromIntent
 import co.pushe.plus.flutter.Pack.getNotificationJsonFromIntent
 import co.pushe.plus.flutter.Utils.lg
+import co.pushe.plus.inappmessaging.PusheInAppMessaging
 import co.pushe.plus.notification.PusheNotification
 import co.pushe.plus.notification.UserNotification
 import io.flutter.plugin.common.BinaryMessenger
@@ -40,11 +42,18 @@ internal class PusheChandler(private val context: Context,
      */
     init {
         val i = IntentFilter()
-        i.addAction(context.packageName + ".nr") // Receive
-        i.addAction(context.packageName + ".nc") // Click
-        i.addAction(context.packageName + ".nbc") // Button click
-        i.addAction(context.packageName + ".nd") // Dismiss
-        i.addAction(context.packageName + ".nccr") // CustomContent receive
+        val packageName = context.packageName
+        i.addAction("$packageName.nr") // Receive
+        i.addAction("$packageName.nc") // Click
+        i.addAction("$packageName.nbc") // Button click
+        i.addAction("$packageName.nd") // Dismiss
+        i.addAction("$packageName.nccr") // CustomContent receive
+
+        i.addAction("$packageName.ir") // InAppMessage received
+        i.addAction("$packageName.ic") // InAppMessage clicked
+        i.addAction("$packageName.it") // InAppMessage triggered
+        i.addAction("$packageName.id") // InAppMessage dismissed
+        i.addAction("$packageName.ibc") // InAppMessage button clicked
         context.registerReceiver(this, i)
     }
 
@@ -55,7 +64,9 @@ internal class PusheChandler(private val context: Context,
         val methodName = call.method
         val notificationModule = Pushe.getPusheService(PusheNotification::class.java)
         val analyticsModule = Pushe.getPusheService(PusheAnalytics::class.java)
+        val piamModule = Pushe.getPusheService(PusheInAppMessaging::class.java)
 
+        @Suppress("DEPRECATION") // Will notify developer in dart code
         when (methodName) {
             "Pushe.initialize" -> Pushe.initialize()
             "Pushe.setUserConsentGiven" -> setUserConsentGiven(call, result)
@@ -97,7 +108,16 @@ internal class PusheChandler(private val context: Context,
             "Pushe.getSubscribedTags" -> result.success(Pushe.getSubscribedTags())
             "Pushe.getSubscribedTopics" -> result.success(Pushe.getSubscribedTopics())
             "Pushe.notificationListener" -> setNotificationListeners(call, result)
+            // Background init
             "Pushe.platformInitialized" -> initializeListenerPlatform(result)
+            // InAppMessaging
+            "Pushe.triggerEvent" -> triggerEvent(call, result, piamModule)
+            "Pushe.disableInAppMessaging" -> disableInAppMessaging(result, piamModule)
+            "Pushe.enableInAppMessaging" -> enableInAppMessaging(result, piamModule)
+            "Pushe.isInAppMessagingEnabled" -> isInAppMessagingEnabled(result, piamModule)
+            "Pushe.initializeInAppListeners" -> initializeInAppMessagingListeners()
+            "Pushe.dismissShownInApp" -> dismissShownInApp(result, piamModule)
+            "Pushe.testInAppMessage" -> testInAppMessage(call, result, piamModule)
             else -> result.notImplemented()
         }
     }
@@ -465,6 +485,72 @@ internal class PusheChandler(private val context: Context,
         result.success(true)
     }
 
+    // region InAppMessaging
+    private fun triggerEvent(call: MethodCall, result: MethodChannel.Result, piamModule: PusheInAppMessaging?) {
+        if(piamModule == null) {
+            result.error("023", "InAppMessaging module is not available. InAppMessaging api will not operate.", null)
+            return
+        } else if(!call.hasArgument("event") || call.argument<Any>("event") == null) {
+            result.error("023", "Triggering event requires Non-null 'event' argument. Call does not have any.", null)
+            return
+        }
+        piamModule.triggerEvent(call.argument("event") ?: "")
+        result.success(true)
+    }
+
+    private fun disableInAppMessaging(result: MethodChannel.Result, piamModule: PusheInAppMessaging?) {
+        if(piamModule == null) {
+            result.error("024", "InAppMessaging module is not available. InAppMessaging api will not operate.", null)
+            return
+        }
+        piamModule.disableInAppMessaging()
+        result.success(true)
+    }
+
+    private fun enableInAppMessaging(result: MethodChannel.Result, piamModule: PusheInAppMessaging?) {
+        if(piamModule == null) {
+            result.error("024", "InAppMessaging module is not available. InAppMessaging api will not operate.", null)
+            return
+        }
+        piamModule.enableInAppMessaging()
+        result.success(true)
+    }
+
+    private fun isInAppMessagingEnabled(result: MethodChannel.Result, piamModule: PusheInAppMessaging?) {
+        if(piamModule == null) {
+            result.error("025", "InAppMessaging module is not available. InAppMessaging api will not operate.", null)
+            return
+        }
+        result.success(piamModule.isInAppMessagingEnabled())
+    }
+
+    fun dismissShownInApp(result: MethodChannel.Result, piamModule: PusheInAppMessaging?) {
+        if(piamModule == null) {
+            result.error("026", "InAppMessaging module is not available. InAppMessaging api will not operate.", null)
+            return
+        }
+        piamModule.dismissShownInApp()
+        result.success(true)
+    }
+
+    @VisibleForTesting
+    fun testInAppMessage(call: MethodCall, result: MethodChannel.Result, piamModule: PusheInAppMessaging?) {
+        if(piamModule == null) {
+            result.error("027", "InAppMessaging module is not available. InAppMessaging api will not operate.", null)
+            return
+        } else if(!call.hasArgument("message") || call.argument<String>("message") == null) {
+            result.error("023", "Testing in app message requires Non-null 'message' argument. Call does not have any.", null)
+            return
+        }
+        piamModule.testInAppMessage(call.argument("message") ?: "", call.argument("instant") ?: false)
+    }
+
+    fun initializeInAppMessagingListeners() {
+        PusheInAppMessagingListener.setListeners(context)
+    }
+
+    // endregion
+
     private fun initializeForegroundNotifications() {
         PusheNotificationListener.setNotificationCallbacks(context.applicationContext)
     }
@@ -477,6 +563,7 @@ internal class PusheChandler(private val context: Context,
      */
     override fun onReceive(context: Context, intent: Intent) {
         val channel = MethodChannel(messenger, "plus.pushe.co/pushe_flutter")
+        val packageName = context.packageName
         FlutterMain.ensureInitializationComplete(context, null)
         val action = if (intent.action == null) "" else intent.action
         if (action.isEmpty()) {
@@ -484,20 +571,36 @@ internal class PusheChandler(private val context: Context,
         }
 
         when (action) {
-            context.packageName + ".nr" -> {
+            "$packageName.nr" -> {
                 channel.invokeMethod("Pushe.onNotificationReceived", getNotificationJsonFromIntent(intent).toString())
             }
-            context.packageName + ".nc" -> {
+            "$packageName.nc" -> {
                 channel.invokeMethod("Pushe.onNotificationClicked", getNotificationJsonFromIntent(intent).toString())
             }
-            context.packageName + ".nbc" -> {
+            "$packageName.nbc" -> {
                 channel.invokeMethod("Pushe.onNotificationButtonClicked", getNotificationJsonFromIntent(intent).toString())
             }
-            context.packageName + ".nccr" -> {
+            "$packageName.nccr" -> {
                 channel.invokeMethod("Pushe.onCustomContentReceived", getCustomContentFromIntent(intent).toString())
             }
-            context.packageName + ".nd" -> {
+            "$packageName.nd" -> {
                 channel.invokeMethod("Pushe.onNotificationDismissed", getNotificationJsonFromIntent(intent).toString())
+            }
+
+            "$packageName.ir" -> {
+                channel.invokeMethod("Pushe.inAppMessageReceived", getInAppMessageFromIntent(intent).toString())
+            }
+            "$packageName.ic" -> {
+                channel.invokeMethod("Pushe.inAppMessageClicked", getInAppMessageFromIntent(intent).toString())
+            }
+            "$packageName.it" -> {
+                channel.invokeMethod("Pushe.inAppMessageTriggered", getInAppMessageFromIntent(intent).toString())
+            }
+            "$packageName.id" -> {
+                channel.invokeMethod("Pushe.inAppMessageDismissed", getInAppMessageFromIntent(intent).toString())
+            }
+            "$packageName.ibc" -> {
+                channel.invokeMethod("Pushe.inAppMessageButtonClicked", getInAppMessageAndButtonFromIntent(intent).toString())
             }
         }
     }
