@@ -3,6 +3,7 @@ package co.pushe.plus.flutter
 import android.content.Intent
 import android.util.Log
 import co.pushe.plus.flutter.Utils.lg
+import co.pushe.plus.inappmessaging.InAppMessage
 import co.pushe.plus.notification.NotificationButtonData
 import co.pushe.plus.notification.NotificationData
 import org.json.JSONArray
@@ -108,7 +109,7 @@ internal object Pack {
     }
 
     @JvmStatic
-    fun getNotificationJsonFromIntent(intent: Intent): JSONObject? {
+    fun getNotificationJsonFromIntent(intent: Intent): JSONObject {
         val o = JSONObject()
         try {
             val data = intent.getStringExtra("data")
@@ -120,13 +121,13 @@ internal object Pack {
     }
 
     @JvmStatic
-    fun getCustomContentFromIntent(intent: Intent): JSONObject? {
+    fun getCustomContentFromIntent(intent: Intent): JSONObject {
         val o = JSONObject()
         try {
             val data = intent.getStringExtra("json")
             o.put("json", JSONObject(data))
         } catch (e: JSONException) {
-            lg("[Parsing notification] Failed to parse notification")
+            lg("Failed to parse notification")
         }
         return o
     }
@@ -138,13 +139,13 @@ internal object Pack {
             val button = intent.getStringExtra("button")
             o = JSONObject(button)
         } catch (e: JSONException) {
-            lg("[Parsing notification] Failed to parse notification button")
+            lg("Failed to parse notification button")
         }
         return o
     }
 
     @JvmStatic
-    fun getNotificationAndButtonFromIntent(intent: Intent): JSONObject? {
+    fun getNotificationAndButtonFromIntent(intent: Intent): JSONObject {
         val o = JSONObject()
         try {
             o.put("notification", getNotificationJsonFromIntent(intent))
@@ -153,6 +154,50 @@ internal object Pack {
         }
         return o
     }
+}
+
+object InAppUtils {
+    @JvmStatic
+    fun getInAppMessage(inAppMessage: InAppMessage): JSONObject {
+        val o = JSONObject()
+        try {
+            o.put("title", inAppMessage.title)
+            o.put("content", inAppMessage.content)
+            val buttons = JSONArray()
+            inAppMessage.buttons?.forEach { button ->
+                val btnObject = JSONObject()
+                btnObject.put("text", button.text)
+                buttons.put(btnObject)
+            }
+            o.put("buttons", buttons)
+        } catch (ignored: java.lang.Exception) {
+            lg("Failed to parse InAppMessage")
+        }
+        return o
+    }
+
+    fun getInAppMessageFromIntent(intent: Intent): JSONObject? {
+        val o = JSONObject()
+        try {
+            val data = intent.getStringExtra("piam")
+            o.put("piam", JSONObject(data))
+        } catch (ignored: java.lang.Exception) {
+            lg("Failed to retrieve message from broadcast.")
+        }
+        return o
+    }
+
+    @JvmStatic
+    fun getInAppMessageAndButtonFromIntent(intent: Intent): JSONObject {
+        val o = JSONObject()
+        try {
+            o.put("message", getInAppMessageFromIntent(intent))
+            o.put("index", intent.getStringExtra("index"))
+        } catch (ignored: JSONException) {
+        }
+        return o
+    }
+
 }
 
 /**

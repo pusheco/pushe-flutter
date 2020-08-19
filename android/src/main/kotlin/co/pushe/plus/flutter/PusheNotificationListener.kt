@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.util.Pair
 import co.pushe.plus.Pushe
 import co.pushe.plus.flutter.HandleStorage.getMessageHandle
 import co.pushe.plus.flutter.HandleStorage.getSetupHandle
@@ -91,7 +90,7 @@ internal object PusheNotificationListener {
                         Log.e(TAG, "onNotification: Failed to get message of callback")
                         return
                     }
-                    handleForegroundMessage(c, c.packageName + ".nr", Pair.create<String, String>("data", message.toString()))
+                    handleForegroundMessage(c, c.packageName + ".nr", "data" to message.toString())
                 } else {
                     lg("Notification is received in the background")
                     val backgroundMessage = getBackgroundNotificationObject(notificationData, type, null)
@@ -105,7 +104,7 @@ internal object PusheNotificationListener {
 
             override fun onCustomContentNotification(customContent: Map<String, Any>) {
                 if (isAppOnForeground()) {
-                    handleForegroundMessage(c, c.packageName + ".nccr", Pair.create<String, String>("json", JSONObject(customContent).toString()))
+                    handleForegroundMessage(c, c.packageName + ".nccr", "json" to JSONObject(customContent).toString())
                 } else {
                     lg("Custom content received in the background")
                     val customContentObject = getCustomContent(customContent)
@@ -123,7 +122,7 @@ internal object PusheNotificationListener {
                         Log.e(TAG, "onNotificationClick: Failed to get message of callback")
                         return
                     }
-                    handleForegroundMessage(c, c.packageName + ".nc", Pair.create<String, String>("data", message.toString()))
+                    handleForegroundMessage(c, c.packageName + ".nc", "data" to message.toString())
                 } else {
                     lg("Notification is clicked in the background")
                     val backgroundMessage = getBackgroundNotificationObject(notificationData, type, null)
@@ -144,7 +143,7 @@ internal object PusheNotificationListener {
                         Log.e(TAG, "onNotificationClick: Failed to get message of callback")
                         return
                     }
-                    handleForegroundMessage(c, c.packageName + ".nd", Pair.create<String, String>("data", message.toString()))
+                    handleForegroundMessage(c, c.packageName + ".nd", "data" to message.toString())
                 } else {
                     lg("Notification is dismissed in the background")
                     val backgroundMessage = getBackgroundNotificationObject(notificationData, type, null)
@@ -165,7 +164,7 @@ internal object PusheNotificationListener {
                         Log.e(TAG, "onNotificationButtonClick: Failed to get message or clicked button of callback")
                         return
                     }
-                    handleForegroundMessage(c, c.packageName + ".nbc", Pair.create<String, String>("data", message.toString()))
+                    handleForegroundMessage(c, c.packageName + ".nbc", "data" to message.toString())
                 } else {
                     lg("Notification button is clicked in the background")
                     val backgroundMessage = getBackgroundNotificationObject(notificationData, type, notificationButtonData)
@@ -203,12 +202,12 @@ internal object PusheNotificationListener {
      * The method will broadcase an intent to throughout the app and the receiver (PushePlugin itself)
      *    will receive it and send it to the dart side for execution.
      */
-    @SafeVarargs
     private fun handleForegroundMessage(context: Context, action: String, vararg data: Pair<String?, String?>) {
         val main = Handler(Looper.getMainLooper())
         main.post {
             FlutterMain.ensureInitializationComplete(context, null)
             val i = Intent(action)
+            i.setPackage(context.packageName)
             for (datum in data) {
                 i.putExtra(datum.first, datum.second)
             }
