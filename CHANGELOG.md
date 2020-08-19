@@ -1,8 +1,19 @@
+## 2.2.0
+
+- Introducing **InAppMessaging** module added to plugin
+- Added APIs:
+    * `triggerEvent` for triggering local events.
+    * `disableInAppMessaging`/`EnableInAppMessaging`/`isInAppMessagingEnabled` to control whether message should be shown or not.
+    * `setInAppMessagingListener` to get a callback when a specific event occurred on InAppMessaging module
+    * `dismissShownInApp` to remove shown InApp message using code
+    * `testInAppMessage` for testing purposes using code
+- Minor improvements
+
 ## 2.1.1
 - Update Native Android dependency to `pushe:2.1.1`
-- Custom RxJava is used to avoid large size when not needed.
-    - If developer or any library is using RxJava, `duplicate` error might be thrown.
-    In that case you should exclude RxJava and instead implement a normal version.
+- Custom RxJava is used to avoid large size when not needed
+    - If developer or any library is using RxJava, `duplicate` error might be thrown
+    In that case you should exclude RxJava and instead implement a normal version
 - Added support for GDPR compliance
 - Native library has been migrated to AndroidX
 - Deprecate `getAndroidId`. Instead, `getDeviceId` should be used
