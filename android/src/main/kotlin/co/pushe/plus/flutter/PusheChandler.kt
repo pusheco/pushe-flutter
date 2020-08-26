@@ -57,7 +57,7 @@ internal class PusheChandler(private val context: Context,
         context.registerReceiver(this, i)
     }
 
-    private val notificationTypes = listOf("IdType.AndroidId", "IdType.GoogleAdvertisingId", "IdType.CustomId")
+    private val notificationTypes = listOf("IdType.DeviceId", "IdType.GoogleAdvertisingId", "IdType.CustomId")
     private val eventTypes = listOf("EventAction.custom", "EventAction.sign_up", "EventAction.login", "EventAction.purchase", "EventAction.achievement", "EventAction.level")
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
@@ -219,8 +219,9 @@ internal class PusheChandler(private val context: Context,
         }
 
         val type = call.argument<String>("type")
+        lg("Type: $type")
         if (!notificationTypes.contains(type)) {
-            result.error("006", "Type must be either 'AndroidId', 'GoogleAdvertisingId' or 'CustomId'", null)
+            result.error("006", "Type must be either 'DeviceId', 'GoogleAdvertisingId' or 'CustomId'", null)
             return
         }
 
@@ -231,11 +232,11 @@ internal class PusheChandler(private val context: Context,
         }
 
         val notification = when (type) {
-            "IdType.AndroidId" -> UserNotification.withAndroidId(id)
+            "IdType.DeviceId" -> UserNotification.withAndroidId(id)
             "IdType.GoogleAdvertisingId" -> UserNotification.withAdvertisementId(id)
             "IdType.CustomId" -> UserNotification.withCustomId(id)
             else -> {
-                result.error("006", "Type must be either 'AndroidId', 'GoogleAdvertisingId' or 'CustomId'", null)
+                result.error("006", "Type must be either 'DeviceId', 'GoogleAdvertisingId' or 'CustomId'", null)
                 return
             }
         }
@@ -276,7 +277,7 @@ internal class PusheChandler(private val context: Context,
 
         val type = call.argument<String>("type")
         if (!notificationTypes.contains(type)) {
-            result.error("020", "Type must be either 'AndroidId', 'GoogleAdvertisingId' or 'CustomId'", null)
+            result.error("020", "Type must be either 'DeviceId', 'GoogleAdvertisingId' or 'CustomId'", null)
             return
         }
 
@@ -286,11 +287,11 @@ internal class PusheChandler(private val context: Context,
             return
         }
         val notification = when (type) {
-            "IdType.AndroidId" -> UserNotification.withAndroidId(id)
+            "IdType.DeviceId" -> UserNotification.withAndroidId(id)
             "IdType.GoogleAdvertisingId" -> UserNotification.withAdvertisementId(id)
             "IdType.CustomId" -> UserNotification.withCustomId(id)
             else -> {
-                result.error("006", "Type must be either 'AndroidId', 'GoogleAdvertisingId' or 'CustomId'", null)
+                result.error("006", "Type must be either 'DeviceId', 'GoogleAdvertisingId' or 'CustomId'", null)
                 return
             }
         }
