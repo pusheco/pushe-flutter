@@ -7,7 +7,8 @@
     * `setInAppMessagingListener` to get a callback when a specific event occurred on InAppMessaging module
     * `dismissShownInApp` to remove shown InApp message using code
     * `testInAppMessage` for testing purposes using code
-- Minor improvements
+- **Fix**: Bug in `sendNotificationToUser` when type was `DeviceId`
+- **Fix**: PlatformChannel crash after successful `sendNotificationToUser`
 
 ## 2.1.1
 - Update Native Android dependency to `pushe:2.1.1`
@@ -19,11 +20,11 @@
 - Deprecate `getAndroidId`. Instead, `getDeviceId` should be used
 
 ## 2.1.1-alpha01
--Update native dependency to `pushe:2.1.1-beta08`
+- Update native dependency to `pushe:2.1.1-beta08`
 
 ## 2.1.0
 
-- Added Support for Android Embedded V2
+- Added Support for **Flutter Embedding V2**
 - Migrate native language to Kotlin
 - Added APIs:
     * `createNotificationChannel`
@@ -65,7 +66,7 @@
 
 ## 1.0.1
 
-* Fix problem with AndroidX projects.
+* Fix problem with **AndroidX** projects.
 
 * Changed example package name.
 
