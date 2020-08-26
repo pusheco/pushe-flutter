@@ -2,17 +2,18 @@
 
 **Pushe** notification service official plugin for Flutter. Pushe is a push notification service. Refer to [Pushe Homepage](https://pushe.co) for more information.
 
-> **NOTE**: **iOS** features are in development. Current version does not support iOS.
+> **NOTE**: **iOS** features are still in development. Current version does not support iOS.
 
 ## Installation
 
 Add the plugin to `pubspec.yaml`:
 
+[![pub package](https://img.shields.io/pub/v/pushe_flutter)](https://pub.dartlang.org/packages/pushe_flutter)
+
 ```yaml
 dependencies:
-  pushe_flutter: $latest
+  pushe_flutter: ^2.2.0
 ```
- [![pub package](https://img.shields.io/pub/v/pushe_flutter)](https://pub.dartlang.org/packages/pushe_flutter)
 
 * If you want to use the latest version, not necessarily released and stable, you can directly use the source code on Github.
 
@@ -40,11 +41,19 @@ Then run `flutter packages get` to sync the libraries.
 * Paste it into `Appliacation` tag of the **AndroidManifest.xml** file in the following directory:
 > `android/app/src/main/AndroidManifest.xml`
 
+Example:
+```xml
+<application>
+    <!-- Other tags -->
+    <meta-data android:name="pushe_token"
+           android:value="PUSHE_TOKEN" />
+</application>
+```
 
 Run the project after and you should be able to see your device id in [console](https://console.pushe.co) after a short time.
 
 #### iOS:
-> iOS features in progress
+> Soon...
 
 ---
 
