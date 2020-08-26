@@ -82,3 +82,34 @@ Future<void> getInfo(BuildContext context, Function(String) onPositive,
     },
   );
 }
+
+///
+/// CoolCard is a widget for BMI sub app.
+/// CoolCard is simply a card which takes a child and a background color.
+///
+class ReusableCard extends StatelessWidget {
+
+  final Widget child;
+  final Color color;
+  final Function onPress;
+  final EdgeInsets margin;
+
+  const ReusableCard(
+      {Key key, @required this.child, this.color: const Color(0xFF1D1E33), this.onPress, this.margin = const EdgeInsets.all(8.0)})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPress,
+      child: Container(
+        margin: margin,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.0),
+          color: color,
+        ),
+        child: child,
+      ),
+    );
+  }
+}

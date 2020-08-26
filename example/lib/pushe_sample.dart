@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pushe_example/utils.dart';
 import 'package:pushe_flutter/pushe.dart';
