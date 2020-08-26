@@ -256,11 +256,12 @@ internal class PusheChandler(private val context: Context,
                 ?.setIconUrl(iconUrl)
                 ?.setNotifIcon(notifIcon)
                 ?.setCustomContent(customContent)
-        notification?.let {
-            notificationModule.sendNotificationToUser(it)
+        if (notification != null) {
+            notificationModule.sendNotificationToUser(notification)
             result.success(true)
+        } else {
+            result.error("006", "There was a problem building notification for sending. Make sure data is provided correctly", null)
         }
-        result.error("006", "Failed to send notification. Unexpected error", null)
     }
 
     private fun sendAdvancedNotification(call: MethodCall, result: MethodChannel.Result, notificationModule: PusheNotification?) {
