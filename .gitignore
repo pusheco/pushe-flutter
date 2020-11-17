@@ -5,3 +5,9 @@
 .pub/
 
 build/
+
+*.iml
+
+.idea/
+
+example/.metadata

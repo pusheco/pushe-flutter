@@ -1,16 +1,8 @@
-# pushe_flutter_example
+# Pushe flutter sample
 
-Demonstrates how to use the pushe_flutter plugin.
+Demonstrates how to use the pushe plugin.
 
-## Getting Started
+## Hint
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The app credentials belongs to Demo account at Pushe console.
+Go to [Pushe console](https://console.pushe.co) and login to demo. You can send notifications to this app.

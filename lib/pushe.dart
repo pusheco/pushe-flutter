@@ -1,17 +1,3 @@
-// import 'dart:async';
-
-// import 'package:flutter/services.dart';
-
-// class PusheFlutter {
-//   static const MethodChannel _channel =
-//       const MethodChannel('pushe_flutter');
-
-//   static Future<String> get platformVersion async {
-//     final String version = await _channel.invokeMethod('getPlatformVersion');
-//     return version;
-//   }
-// }
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
@@ -439,8 +425,8 @@ class Pushe {
       if (backgroundMessageHandle == null) {
         throw ArgumentError(
             '''Failed to setup background handle. `backgroundNotificationListener` must be a TOPLEVEL or a STATIC method.
-      Checkout Flutter FAQ at https://docs.pushe.co for more information.
-      ''');
+       Checkout Flutter FAQ at https://docs.pushe.co for more information.
+       ''');
       }
       _channel.invokeMethod<bool>(
         'Pushe.notificationListener',
