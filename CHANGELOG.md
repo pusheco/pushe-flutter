@@ -1,6 +1,6 @@
 # ChangeLog
 
-## 2.3.0
+## 2.3.0-alpha01
 
 > **New**
 > PusheFlutter now features iOS support
