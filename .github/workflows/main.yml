@@ -17,8 +17,9 @@ jobs:
           echo "Initializing git"
           git config --global user.name "Mahdi-Malv"
           git config --global user.email "mmalvandi75@gmail.com"
-      - uses: webfactory/ssh-agent@v0.2.0
+      - uses: webfactory/ssh-agent@v0.4.1
         with:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
           ssh-private-key: ${{ secrets.ACTION_PRIVATE_KEY }}
       - name: Rename something to something else using renamer
         run: |
