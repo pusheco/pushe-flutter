@@ -6,6 +6,7 @@
 > PusheFlutter now features iOS support
 
 - [change] Inner plugin classes are changed to respect iOS native classes
+- **Android**: Update native library to `2.2.1`
 
 
 ## 2.2.0
