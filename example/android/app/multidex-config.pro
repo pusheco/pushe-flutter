@@ -1,0 +1,4 @@
+-keep io.flutter.app.FlutterApplication { *; }
+-keep io.flutter.view.FlutterMain { *; }
+-keep io.flutter.util.PathUtils { *; }
+-keep class android.app.** { *; }
