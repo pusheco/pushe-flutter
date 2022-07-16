@@ -1,0 +1,17 @@
+.DS_Store
+.dart_tool/
+
+.packages
+.pub/
+
+build/
+
+*.iml
+
+.idea/
+
+example/.metadata
+
+example/\.flutter-plugins-dependencies
+
+example/ios/Flutter/flutter_export_environment\.sh
